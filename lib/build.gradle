@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
 
     defaultConfig {
-        minSdkVersion 15
+        minSdkVersion 7
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -20,12 +20,15 @@ android {
         }
     }
 
+    lintOptions {
+        abortOnError false
+    }
+
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.aspectj:aspectjrt:1.8.+"
-    implementation 'com.android.support:appcompat-v7:26.1.0'
     compile project(path: ':annotation')
 }
 
@@ -33,10 +36,11 @@ dependencies {
 apply plugin: 'com.novoda.bintray-release'
 
 publish {
-    userOrg = 'ganyao114'
-    groupId = 'com.trend.lazyinject'
+    userOrg = rootProject.userOrg
+    groupId = rootProject.groupId
     artifactId = 'lib'
-    publishVersion = '0.0.1-beta'
-    desc = 'lib of lazyinject'
-    website = 'https://github.com/ganyao114/lazyInject'
+    publishVersion = rootProject.publishVersion
+    desc = rootProject.desc
+    website = rootProject.website
+    licences = rootProject.licences
 }

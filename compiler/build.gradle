@@ -18,10 +18,11 @@ dependencies {
 apply plugin: 'com.novoda.bintray-release'
 
 publish {
-    userOrg = 'ganyao114'
-    groupId = 'com.trend.lazyinject'
+    userOrg = rootProject.userOrg
+    groupId = rootProject.groupId
     artifactId = 'compiler'
-    publishVersion = '0.0.1-beta'
-    desc = 'compiler of lazyinject'
-    website = 'https://github.com/ganyao114/lazyInject'
+    publishVersion = rootProject.publishVersion
+    desc = rootProject.desc
+    website = rootProject.website
+    licences = rootProject.licences
 }

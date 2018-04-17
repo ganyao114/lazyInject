@@ -1,5 +1,4 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
     ext.kotlin_version = '1.2.31'
     repositories {
@@ -21,6 +20,9 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven {
+            url "https://dl.bintray.com/ganyao114/maven/"
+        }
     }
     tasks.withType(Javadoc) {
         options.addStringOption('Xdoclint:none', '-quiet')
@@ -30,6 +32,15 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+ext {
+    userOrg = 'ganyao114'
+    groupId = 'com.trend.lazyinject'
+    publishVersion = '0.0.2-beta'
+    desc = 'lazy inject framework for android'
+    website = 'https://github.com/ganyao114/lazyInject'
+    licences = ['Apache-2.0']
 }
 
 tasks.getByPath(":kotlinsupport:releaseAndroidJavadocs").enabled = false
