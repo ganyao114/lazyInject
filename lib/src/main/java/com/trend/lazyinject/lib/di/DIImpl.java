@@ -1,6 +1,6 @@
 package com.trend.lazyinject.lib.di;
 
-import com.trend.lazyinject.annotation.Exclude;
+import com.trend.lazyinject.annotation.Provide;
 import com.trend.lazyinject.lib.component.ComponentBuilder;
 import com.trend.lazyinject.lib.component.ComponentContainer;
 import com.trend.lazyinject.lib.utils.ValidateUtil;
@@ -29,10 +29,10 @@ public class DIImpl {
             container = new ComponentContainer();
             container.setComponentType(component);
 methods:    for (Method method:component.getMethods()) {
+                if (!method.isAnnotationPresent(Provide.class))
+                    continue;
                 Type retType = method.getGenericReturnType();
                 if (retType == null || retType.equals(Void.TYPE) || filterBase(method))
-                    continue;
-                if (method.isAnnotationPresent(Exclude.class))
                     continue;
                 Class[] pars = method.getParameterTypes();
                 if (!ValidateUtil.isEmpty(pars)) {

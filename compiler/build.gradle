@@ -5,7 +5,7 @@ targetCompatibility = 1.8
 
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'trendmicro-di-compiler'
+    bintrayName = 'trend-di-compiler'
 }
 
 dependencies {

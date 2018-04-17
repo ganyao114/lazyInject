@@ -1,11 +1,11 @@
 apply plugin: 'java'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 ext {
     bintrayRepo = 'maven'
-    bintrayName = 'trendmicro-di-annotation'
+    bintrayName = 'trend-di-annotation'
 }
 
 dependencies {

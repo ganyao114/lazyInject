@@ -117,6 +117,10 @@ public class ComponentManager {
         }
     }
 
+    public static void inject(Object target, Object... components) {
+
+    }
+
     private static void doInject(Object target, Class type) {
         for (Field field:type.getDeclaredFields()) {
             Inject inject = field.getAnnotation(Inject.class);
