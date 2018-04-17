@@ -2,6 +2,7 @@ package com.trend.lazyinject.demo;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.InjectComponent;
@@ -33,19 +34,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if (integers != null) {
-            LOG.LOGD("test", "List<Integer> inject success = " + integers.toString());
+            Log.d("test", "List<Integer> inject success = " + integers.toString());
         }
         if (testComponent != null) {
-            LOG.LOGD("test", "TestComponent inject success = " + testComponent.toString());
+            Log.d("test", "TestComponent inject success = " + testComponent.toString());
         }
         if (strings != null) {
-            LOG.LOGD("test", "List<String> inject success = " + strings.toString());
+            Log.d("test", "List<String> inject success = " + strings.toString());
         }
         if (baseModel != null) {
-            LOG.LOGD("test", "BaseModel inject success = " + baseModel.toString());
+            Log.d("test", "BaseModel inject success = " + baseModel.toString());
         }
         if (map != null) {
-            LOG.LOGD("test", "Map<String,ModelA> inject success = " + map.toString());
+            Log.d("test", "Map<String,ModelA> inject success = " + map.toString());
         }
     }
 }
