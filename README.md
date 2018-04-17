@@ -1,11 +1,11 @@
 # 1.lazyInject
 被动依赖注入框架 for Android
-# 2.配置
-##关闭 Instant Run
+# 2.配置  
+##关闭 Instant Run  
 Setting->Build->Instant Run  
-此项功能与 AspectJ(本项目依赖 AsoectJ) 冲突
-##Gradle
-根目录/build.gradle
+此项功能与 AspectJ(本项目依赖 AsoectJ) 冲突  
+##Gradle  
+根目录/build.gradle  
 ```
 buildscript {
     
@@ -45,9 +45,9 @@ dependencies {
     compile 'com.trend.lazyinject:kotlinsupport:0.0.3-beta'
 }
 
-```
-##混淆
-```
+```  
+##混淆  
+```  
 -ignorewarning
 -keepattributes *Annotation*
 #保留部分泛型信息，必要!
@@ -76,11 +76,11 @@ dependencies {
 -keepclassmembers class * {
     @com.trend.lazyinject.annotation.Component *;
 }
-```
-#3.Example
-##Component
-&nbsp;&nbsp;参考 Dagger2，在 LazyInject 中 Component 为注入容器。
-###Component 定义
+```  
+#3.Example  
+##Component  
+&nbsp;&nbsp;参考 Dagger2，在 LazyInject 中 Component 为注入容器。  
+###Component 定义  
 ```
 @Component
 public interface TestComponent {
