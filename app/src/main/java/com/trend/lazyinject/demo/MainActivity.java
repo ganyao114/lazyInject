@@ -13,6 +13,8 @@ import com.trend.lazyinject.demo.model.ModelA;
 import com.trend.lazyinject.lib.LazyInject;
 import com.trend.lazyinject.lib.log.LOG;
 
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     @Inject(component = TestComponent.class)
     BaseModel baseModel;
     @Inject(component = TestComponent.class)
-    Map<String,ModelA> map;
+    Map<String,? extends Collection> map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

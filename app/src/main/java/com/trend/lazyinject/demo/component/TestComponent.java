@@ -5,6 +5,7 @@ import com.trend.lazyinject.annotation.Provide;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.ModelA;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +14,7 @@ import java.util.Map;
  * Created by swift_gan on 2018/4/17.
  */
 @Component
-public interface TestComponent {
+public interface TestComponent<T extends Serializable & List> {
     @Provide
     List<String> provide1();
     @Provide
@@ -26,4 +27,6 @@ public interface TestComponent {
     Map<String,BaseModel> provide5();
     @Provide
     Map<String, ? extends ModelA> provide6();
+    @Provide
+    Map<String,T> provide7();
 }

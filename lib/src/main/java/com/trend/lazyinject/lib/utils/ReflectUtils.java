@@ -176,15 +176,25 @@ public class ReflectUtils {
         }
 
         if (inter instanceof WildcardType) {
-            Type[] type = ((WildcardType) impl).getLowerBounds();
-            if (ValidateUtil.isEmpty(type))
-                return canCast(Object.class, impl);
-            for (Type t : type) {
-                if (canCast(t, impl)) {
-                    return true;
+            Type[] upperBounds = ((WildcardType) inter).getUpperBounds();
+            Type[] lowerBounds = ((WildcardType) inter).getLowerBounds();
+            if (!ValidateUtil.isEmpty(lowerBounds)) {
+                for (Type t : lowerBounds) {
+                    if (!canCast(t, impl)) {
+                        return false;
+                    }
                 }
+                return true;
+            } else if (!ValidateUtil.isEmpty(upperBounds)) {
+                for (Type t : upperBounds) {
+                    if (!canCast(t, impl)) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                return canCast(Object.class, impl);
             }
-            return false;
         }
 
         if (impl instanceof TypeVariable) {
@@ -204,11 +214,11 @@ public class ReflectUtils {
             if (ValidateUtil.isEmpty(type))
                 return canCast(Object.class, impl);
             for (Type t : type) {
-                if (canCast(t, impl)) {
-                    return true;
+                if (!canCast(t, impl)) {
+                    return false;
                 }
             }
-            return false;
+            return true;
         }
 
         if (inter instanceof ParameterizedType) {

@@ -37,7 +37,7 @@ task clean(type: Delete) {
 ext {
     userOrg = 'ganyao114'
     groupId = 'com.trend.lazyinject'
-    publishVersion = '0.0.3-beta'
+    publishVersion = '0.0.4-beta'
     desc = 'lazy inject framework for android'
     website = 'https://github.com/ganyao114/lazyInject'
     licences = ['Apache-2.0']
