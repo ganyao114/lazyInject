@@ -4,6 +4,7 @@ import com.trend.lazyinject.annotation.DebugLog;
 import com.trend.lazyinject.annotation.NoCache;
 import com.trend.lazyinject.lib.di.DIImpl;
 import com.trend.lazyinject.lib.log.LOG;
+import com.trend.lazyinject.lib.thread.ThreadPool;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -217,12 +218,12 @@ public class ComponentBuilder {
     }
 
     public static void registerProviderAsync(final Class component) {
-        new Thread(new Runnable() {
+        ThreadPool.DEFAULT.submit(new Runnable() {
             @Override
             public void run() {
                 DIImpl.registerProvider(component);
             }
-        }).start();
+        });
     }
 
 }
