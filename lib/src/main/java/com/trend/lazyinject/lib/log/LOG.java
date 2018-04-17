@@ -8,7 +8,7 @@ import com.trend.lazyinject.BuildConfig;
 
 public class LOG {
 
-    public static final boolean DEBUGGING_ENABLED = BuildConfig.DEBUG;
+    public static boolean DEBUGGING_ENABLED = BuildConfig.DEBUG;
 
     public static void LOGV(String tag, String message) {
         if (DEBUGGING_ENABLED && !TextUtils.isEmpty(message)) {

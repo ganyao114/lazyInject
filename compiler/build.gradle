@@ -13,3 +13,15 @@ dependencies {
     compile 'com.google.auto.service:auto-service:1.0-rc3'
     compile project(':annotation')
 }
+
+
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'ganyao114'
+    groupId = 'com.trend.lazyinject'
+    artifactId = 'compiler'
+    publishVersion = '0.0.1-beta'
+    desc = 'compiler of lazyinject'
+    website = 'https://github.com/ganyao114/lazyInject'
+}

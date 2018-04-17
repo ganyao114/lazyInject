@@ -2,6 +2,8 @@ package com.trend.lazyinject.lib;
 
 import com.trend.lazyinject.lib.component.ComponentBuilder;
 import com.trend.lazyinject.lib.component.ComponentManager;
+import com.trend.lazyinject.lib.log.LOG;
+import com.trend.lazyinject.lib.log.MethodMonitor;
 
 /**
  * Created by ganyao on 2018/4/16.
@@ -41,6 +43,11 @@ public class LazyInject {
 
     public static void removeComponent(Class type) {
         ComponentManager.removeComponent(type);
+    }
+
+    public static void setDebug(boolean debug) {
+        LOG.DEBUGGING_ENABLED = debug;
+        MethodMonitor.DEBUG = debug;
     }
 
 }

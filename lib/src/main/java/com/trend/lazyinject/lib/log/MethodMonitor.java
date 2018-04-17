@@ -20,6 +20,9 @@ import java.util.concurrent.TimeUnit;
 
 @Aspect
 public class MethodMonitor {
+
+    public static boolean DEBUG = BuildConfig.DEBUG;
+
     @Pointcut("within(@com.trend.lazyinject.annotation.DebugLog *)")
     public void withinAnnotatedClass() {}
 
@@ -38,7 +41,7 @@ public class MethodMonitor {
     @Around("method() || constructor()")
     public Object logAndExecute(ProceedingJoinPoint joinPoint) throws Throwable {
 
-        if (!BuildConfig.DEBUG)
+        if (!DEBUG)
             return joinPoint.proceed();
 
         enterMethod(joinPoint);
