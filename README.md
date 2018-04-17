@@ -1,10 +1,10 @@
 # 1.lazyInject
 被动依赖注入框架 for Android
-# 2.配置  
-##关闭 Instant Run  
+# 2.配置
+## 关闭 Instant Run  
 Setting->Build->Instant Run  
 此项功能与 AspectJ(本项目依赖 AsoectJ) 冲突  
-##Gradle  
+## Gradle  
 根目录/build.gradle  
 ```
 buildscript {
@@ -46,7 +46,7 @@ dependencies {
 }
 
 ```  
-##混淆  
+## 混淆  
 ```  
 -ignorewarning
 -keepattributes *Annotation*
@@ -77,10 +77,10 @@ dependencies {
     @com.trend.lazyinject.annotation.Component *;
 }
 ```  
-#3.Example  
-##Component  
+# 3.Example  
+## Component  
 &nbsp;&nbsp;参考 Dagger2，在 LazyInject 中 Component 为注入容器。  
-###Component 定义  
+### Component 定义  
 ```
 @Component
 public interface TestComponent {
@@ -99,7 +99,7 @@ public interface TestComponent {
 }
 ```
 &nbsp;&nbsp;打上 @Provide 注解的方法将被暴露为依赖的提供者，注意 LazyInject 和 Dagger2 不同的是没有实现 Scope 管理，注入元素需要在 Component 的实现类中自行管理。简单理解为每次注入都会调用对应的 provide 方法。
-###Component 实现
+### Component 实现
 ```
 @ComponentImpl
 public class TestComponentImpl implements TestComponent {
@@ -141,7 +141,7 @@ public @interface ComponentImpl {
 需要注意两个参数:  
 1. name 指定后，如果某个 Component 存在多个实现类，可在编译时指定具体的实现。  
 2. cache = false 时，每次注入都将会调用下面所说的 build 静态方法(也就是说默认会 new 一个新的 Component)，一般适用于当 Component 为 MVP 中的 Presenter 时。
-###Component 管理
+### Component 管理
 &nbsp;&nbsp;Component 默认在进程中全局单例
 ####手动管理
 ```
@@ -149,8 +149,8 @@ LazyInject.registerComponent(component, instance);
 LazyInject.getComponent(component, instance);
 LazyInject.removeComponent(component, instance);
 ```
-####自动管理
-#####编写 BuildMap
+#### 自动管理
+##### 编写 BuildMap
 &nbsp;&nbsp;为了让框架找到对应 Component 的构造方法，你需要实现一个完全由对应静态方法构成的类，该类默认会由注解处理器自动生成
 ```
 @Keep
@@ -171,11 +171,11 @@ public class DemoApplication extends Application {
 }
 ```
 &nbsp;&nbsp;当然也可以模仿这个手动编写
-##注入
-###主动注入
+## 注入
+### 主动注入
 &nbsp;&nbsp;主动注入的原理是利用 AspectJ 编译时 hook field get 操作。所以注入是被动的。  
 &nbsp;&nbsp;除了加上 @Inject 注解并不需要做其他操作。
-####@Inject
+#### @Inject
 ```
 @Target(FIELD)
 @Retention(RUNTIME)
@@ -235,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
     }
 }
 ```
-####@InjectComponent
+#### @InjectComponent
 &nbsp;&nbsp;@InjectComponent 注解用于注入 Component 容器。  
 
 &nbsp;&nbsp;一般使用 MVP 时常用到。
@@ -310,23 +310,23 @@ public class LoginActivity extends AppCompatActivity implements LoginMVP.View {
     public void loginError() {}
 }
 ```
-###主动注入
+### 主动注入
 &nbsp;&nbsp;主动注入不需要开启 AspectJ  
 &nbsp;&nbsp;区别在于需要用户手动调用 LazyInject.inject(this);  
 &nbsp;&nbsp;不支持 alwaysRefresh
-###Kotlin Support
-####使用 Kotlin 特性动态代理
+### Kotlin Support
+#### 使用 Kotlin 特性动态代理
 ```
 val map: Map<Any,Any> by provideElement(TestComponent::class)
 ```
 &nbsp;&nbsp;缺点在于不能混淆,混淆会丢失类型元数据，请等待 proguard 修复，从设计角度来说 kotlin side 难以修复。  
 &nbsp;&nbsp;case:https://youtrack.jetbrains.com/issue/KT-21869  
-####继续使用注解，和 Java 类似
+#### 继续使用注解，和 Java 类似
 ```
 @Provide(component = TestComponent::class, alwaysRefresh = true)
 var strs: List<String>? = null;
 ```
-##Build 配置
+## Build 配置
 &nbsp;&nbsp;对应子 Module/build.gradle
 ```
 android {
@@ -344,7 +344,7 @@ android {
 ```
 &nbsp;&nbsp;自动生成 com.trend.lazyinject.demo.AppBuildMap，并且选用 Product 实现  
 
-##Debug 开关
+## Debug 开关
 &nbsp;&nbsp;打开将显示 log  
 ```
 LazyInject.setDebug(true);
