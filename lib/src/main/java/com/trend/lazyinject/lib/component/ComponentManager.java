@@ -2,6 +2,7 @@ package com.trend.lazyinject.lib.component;
 
 import android.text.TextUtils;
 
+import com.trend.lazyinject.annotation.Component;
 import com.trend.lazyinject.annotation.DebugLog;
 import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.Name;
@@ -33,6 +34,10 @@ public class ComponentManager {
     private static Map<Field,Method> providerCacheTop = new ConcurrentHashMap<>();
 
     public static <T> void registerComponent(Class<T> type, T instance) {
+        registerComponent(type, instance, true);
+    }
+
+    public static <T> void registerComponent(Class<T> type, T instance, boolean cacheProvider) {
         if (!type.isInstance(instance))
             return;
         Name name = (Name) type.getAnnotation(Name.class);
@@ -43,6 +48,9 @@ public class ComponentManager {
             }
         }
         components.put(type, instance);
+        if (cacheProvider) {
+            ComponentBuilder.registerProviderAsync(type);
+        }
     }
 
     public static <T> void registerComponent(Class type, T instance, String key) {
@@ -69,7 +77,7 @@ public class ComponentManager {
                 if (wrapper != null) {
                     t = wrapper.component;
                     if (!wrapper.noCache) {
-                        registerComponent(type, t);
+                        registerComponent(type, t, false);
                     }
                 }
             }
@@ -118,7 +126,29 @@ public class ComponentManager {
     }
 
     public static void inject(Object target, Object... components) {
+        if (ValidateUtil.isEmpty(components))
+            return;
+        Class<?> template = target.getClass();
+        while (template != null && template != Object.class) {
+            // 过滤掉基类 因为基类是不包含注解的
+            String clazzName = template.getName();
+            if (clazzName.startsWith("java.") || clazzName.startsWith("javax.")
+                    || clazzName.startsWith("android.")) {
+                break;
+            }
+            doInject(target, template, components);
+            template = template.getSuperclass();
+        }
+    }
 
+    private static void doInject(Object target, Class type, Object... components) {
+        for (Field field:type.getDeclaredFields()) {
+            Inject inject = field.getAnnotation(Inject.class);
+            if (inject != null) {
+                doInjectProvide(inject, target, field, components);
+                continue;
+            }
+        }
     }
 
     private static void doInject(Object target, Class type) {
@@ -166,9 +196,37 @@ public class ComponentManager {
         }
         Object value = null;
         if (ValidateUtil.isEmpty(inject.args())) {
-            value = providerValue(component, field);
+            value = providerValue(component, field, null);
         } else {
-            value = providerValue(component, field, inject.args());
+            value = providerValue(component, field, null, inject.args());
+        }
+        if (value == null)
+            return;
+        try {
+            if (!field.isAccessible()) {
+                field.setAccessible(true);
+            }
+            field.set(target, value);
+        } catch (IllegalAccessException e) {
+            LOG.LOGE("ComponentManager", "inject value error! : " + field.toString(), e);
+        }
+    }
+
+    private static void doInjectProvide(Inject inject, Object target, Field field, Object... components) {
+        Class component = inject.component();
+        if (component == Inject.None.class) {
+            component = field.getType().getEnclosingClass();
+            if (component == null || component == Object.class)
+                return;
+        }
+        Object componentImpl = getComponentImpl(component, components);
+        if (componentImpl == null)
+            return;
+        Object value = null;
+        if (ValidateUtil.isEmpty(inject.args())) {
+            value = providerValue(component, field, componentImpl);
+        } else {
+            value = providerValue(component, field, componentImpl, inject.args());
         }
         if (value == null)
             return;
@@ -183,7 +241,7 @@ public class ComponentManager {
     }
 
     @DebugLog
-    public static Object providerValue(Class componentType, Field field) {
+    public static Object providerValue(Class componentType, Field field, Object component) {
         Method provider = providerCacheTop.get(field);
         if (provider == null) {
             provider = doGetProvider(componentType, field.getGenericType());
@@ -191,7 +249,9 @@ public class ComponentManager {
                 return null;
             providerCacheTop.put(field, provider);
         }
-        Object component = getComponent(componentType);
+        if (component == null) {
+            component = getComponent(componentType);
+        }
         if (component == null)
             return null;
         Class[] pars = provider.getParameterTypes();
@@ -210,7 +270,7 @@ public class ComponentManager {
     }
 
     @DebugLog
-    public static Object providerValue(Class componentType, Field field, Object... args) {
+    public static Object providerValue(Class componentType, Field field, Object component, Object... args) {
         Method provider = providerCacheTop.get(field);
         if (provider == null) {
             provider = doGetProvider(componentType, field.getGenericType());
@@ -218,7 +278,9 @@ public class ComponentManager {
                 return null;
             providerCacheTop.put(field, provider);
         }
-        Object component = getComponent(componentType);
+        if (component == null) {
+            component = getComponent(componentType);
+        }
         if (component == null)
             return null;
         try {
@@ -295,6 +357,17 @@ public class ComponentManager {
             objects[i] = "";
         }
         return objects;
+    }
+
+    private static Object getComponentImpl(Class component, Object[] componentImpls) {
+        if (ValidateUtil.isEmpty(componentImpls))
+            return null;
+        for (Object impl:componentImpls) {
+            if (component.isInstance(impl)) {
+                return impl;
+            }
+        }
+        return null;
     }
 
 

@@ -22,7 +22,7 @@ public class LazyInject {
     }
 
     public static void inject(Object target, Object... components) {
-
+        ComponentManager.inject(target, components);
     }
 
     public static void inject(Object target, boolean nest) {

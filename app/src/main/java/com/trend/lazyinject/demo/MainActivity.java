@@ -6,6 +6,7 @@ import android.os.Bundle;
 import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.demo.component.TestComponent;
+import com.trend.lazyinject.demo.component.TestComponentImpl;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.ModelA;
 import com.trend.lazyinject.lib.LazyInject;
