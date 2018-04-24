@@ -351,6 +351,5 @@ LazyInject.setDebug(true);
 ```
 
 
-# 联系方式
-email:939543405@qq.com  
-QQ:939543405
+# Email
+939543405@qq.com  
