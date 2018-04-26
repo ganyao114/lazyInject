@@ -1,19 +1,14 @@
 package com.trend.lazyinject.demo;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.demo.component.TestComponent;
-import com.trend.lazyinject.demo.component.TestComponentImpl;
 import com.trend.lazyinject.demo.model.BaseModel;
-import com.trend.lazyinject.demo.model.ModelA;
-import com.trend.lazyinject.lib.LazyInject;
-import com.trend.lazyinject.lib.log.LOG;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -21,15 +16,15 @@ import java.util.Map;
 public class MainActivity extends AppCompatActivity {
 
     @Inject(component = TestComponent.class)
-    List<Integer> integers;
+    public static List<Integer> integers;
     @InjectComponent
-    TestComponent testComponent;
+    public static TestComponent testComponent;
     @Inject(component = TestComponent.class)
     List<String> strings;
     @Inject(component = TestComponent.class)
     BaseModel baseModel;
     @Inject(component = TestComponent.class)
-    Map<String,? extends Collection> map;
+    Map<String, ? extends Collection> map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -19,14 +19,15 @@ import java.lang.reflect.Field;
 @Aspect
 public class InjectAspect {
 
-    @Pointcut("get(* *) && @annotation(inject) && target(targetObj)")
-    public void pointcutInject(Inject inject, Object targetObj) {
+    @Pointcut("get(* *) && @annotation(inject)")
+    public void pointcutInject(Inject inject) {
 
     }
 
-    @Around("pointcutInject(inject, targetObj)")
-    public Object aroundFieldGet(ProceedingJoinPoint joinPoint, Inject inject, Object targetObj) throws Throwable {
-        Field field = ReflectUtils.getField(targetObj.getClass(), joinPoint.getSignature().getName(), Inject.class);
+    @Around("pointcutInject(inject)")
+    public Object aroundFieldGet(ProceedingJoinPoint joinPoint, Inject inject) throws Throwable {
+        Object targetObj = joinPoint.getTarget();
+        Field field = ReflectUtils.getField(joinPoint, Inject.class);
         if (field == null)
             return joinPoint.proceed();
         if (!field.isAccessible()) {
