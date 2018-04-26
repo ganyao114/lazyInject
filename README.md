@@ -39,10 +39,10 @@ app 或者 lib/build.gradle
 apply plugin: 'android-aspectjx'
 
 dependencies {
-    compile 'com.trend.lazyinject:lib:0.0.4-beta'
-    annotationProcessor 'com.trend.lazyinject:compiler:0.0.4-beta'
+    compile 'com.trend.lazyinject:lib:0.0.5-beta'
+    annotationProcessor 'com.trend.lazyinject:compiler:0.0.5-beta'
     //如果使用 kotlin
-    compile 'com.trend.lazyinject:kotlinsupport:0.0.4-beta'
+    compile 'com.trend.lazyinject:kotlinsupport:0.0.5-beta'
 }
 
 ```  
