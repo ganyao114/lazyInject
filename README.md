@@ -1,5 +1,7 @@
 # 1.lazyInject
 被动依赖注入框架 for Android
+
+ [ ![Download](https://api.bintray.com/packages/ganyao114/maven/lib/images/download.svg) ](https://bintray.com/ganyao114/maven/lib/_latestVersion)
 # 2.配置
 ## 关闭 Instant Run  
 Setting->Build->Instant Run  
