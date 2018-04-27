@@ -2,6 +2,7 @@ package com.trend.lazyinject.lib.di;
 
 import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.lib.component.ComponentManager;
+import com.trend.lazyinject.lib.proxy.InterfaceProxy;
 import com.trend.lazyinject.lib.utils.ReflectUtils;
 import com.trend.lazyinject.lib.utils.ValidateUtil;
 
@@ -18,6 +19,8 @@ import java.lang.reflect.Field;
  */
 @Aspect
 public class InjectAspect {
+
+
 
     @Pointcut("get(* *) && @annotation(inject)")
     public void pointcutInject(Inject inject) {
@@ -38,13 +41,21 @@ public class InjectAspect {
             if (field.get(targetObj) != null)
                 return joinPoint.proceed();
             res = getValue(inject.component(), field, inject.args());
-            if (res == null)
-                return null;
+            if (res == null) {
+                if (inject.nullProtect()) {
+                    res = InterfaceProxy.make(field.getType());
+                }
+                return res;
+            }
             field.set(targetObj, res);
         } else {
             res = getValue(inject.component(), field, inject.args());
-            if (res == null)
-                return null;
+            if (res == null) {
+                if (inject.nullProtect()) {
+                    res = InterfaceProxy.make(field.getType());
+                }
+                return res;
+            }
             field.set(targetObj, res);
         }
         return res;

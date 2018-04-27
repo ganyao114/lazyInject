@@ -8,6 +8,7 @@ import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.demo.component.TestComponent;
 import com.trend.lazyinject.demo.model.BaseModel;
+import com.trend.lazyinject.demo.model.NullProtectTestA;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,6 +26,12 @@ public class MainActivity extends AppCompatActivity {
     BaseModel baseModel;
     @Inject(component = TestComponent.class)
     Map<String, ? extends Collection> map;
+
+    //NullProtect
+    @InjectComponent(nullProtect = true)
+    NullProtectTestA nullProtectTestA;
+    @Inject(nullProtect = true)
+    NullProtectTestA nullProtectTestA2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +51,14 @@ public class MainActivity extends AppCompatActivity {
         }
         if (map != null) {
             Log.d("test", "Map<String,ModelA> inject success = " + map.toString());
+        }
+        if (nullProtectTestA != null) {
+            nullProtectTestA.test1();
+            nullProtectTestA.test2("....");
+        }
+        if (nullProtectTestA2 != null) {
+            nullProtectTestA2.test1();
+            nullProtectTestA2.test2("....");
         }
     }
 }

@@ -13,4 +13,6 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 public @interface InjectComponent {
     String value() default "";
+    boolean alwaysRefresh() default false;
+    boolean nullProtect() default false;
 }

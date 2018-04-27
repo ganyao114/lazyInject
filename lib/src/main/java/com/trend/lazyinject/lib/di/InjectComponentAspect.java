@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.lib.component.ComponentManager;
 import com.trend.lazyinject.lib.log.LOG;
+import com.trend.lazyinject.lib.proxy.InterfaceProxy;
 import com.trend.lazyinject.lib.utils.ReflectUtils;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -35,7 +36,7 @@ public class InjectComponentAspect {
             field.setAccessible(true);
         }
         Object component = field.get(targetObj);
-        if (component != null)
+        if (component != null && !injectComponent.alwaysRefresh())
             return joinPoint.proceed();
         String name = injectComponent.value();
         if (TextUtils.isEmpty(name)) {
@@ -50,6 +51,8 @@ public class InjectComponentAspect {
             } catch (IllegalAccessException e) {
                 LOG.LOGE("InjectComponentAspect", "Inject component " + field.getName() + " error!", e);
             }
+        } else if (injectComponent.nullProtect()){
+            return InterfaceProxy.make(field.getType());
         }
         return joinPoint.proceed();
     }

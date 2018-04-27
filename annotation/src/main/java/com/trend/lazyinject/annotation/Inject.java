@@ -12,9 +12,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface Inject {
+
     Class<?> component() default None.class;
     boolean alwaysRefresh() default false;
     String[] args() default {};
+    boolean nullProtect() default false;
 
     class None {}
 
