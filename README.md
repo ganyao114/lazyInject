@@ -41,10 +41,10 @@ app 或者 lib/build.gradle
 apply plugin: 'android-aspectjx'
 
 dependencies {
-    compile 'com.trend.lazyinject:lib:0.0.5-beta'
-    annotationProcessor 'com.trend.lazyinject:compiler:0.0.5-beta'
+    compile 'com.trend.lazyinject:lib:0.0.6-beta'
+    annotationProcessor 'com.trend.lazyinject:compiler:0.0.6-beta'
     //如果使用 kotlin
-    compile 'com.trend.lazyinject:kotlinsupport:0.0.5-beta'
+    compile 'com.trend.lazyinject:kotlinsupport:0.0.6-beta'
 }
 
 ```  
@@ -187,7 +187,9 @@ public @interface Inject {
     //为 true 时每次 get 该 field 都会注入一个新的值
     boolean alwaysRefresh() default false;
     //可以向注入方法传递 String 类型的参数
-    String[] args() default {};
+    String[] args() default {};  
+    //当无法找到合适的值时,会自动虚拟一个对象以避免空指针异常。  
+    boolean nullProtect() default false;  
 
     class None {}
 
@@ -199,6 +201,8 @@ Class<?> component() default None.class;
 boolean alwaysRefresh() default false;  
 //可以向注入方法传递 String 类型的参数  
 String[] args() default {};  
+//当无法找到合适的值时,会自动虚拟一个对象以避免空指针异常。 
+boolean nullProtect() default false;  
 
 Example
 ```
