@@ -10,6 +10,7 @@ import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.lib.cache.ProviderCache;
 import com.trend.lazyinject.lib.di.DIImpl;
 import com.trend.lazyinject.lib.log.LOG;
+import com.trend.lazyinject.lib.proxy.InterfaceProxy;
 import com.trend.lazyinject.lib.utils.ValidateUtil;
 
 import java.lang.reflect.Field;
@@ -175,6 +176,9 @@ public class ComponentManager {
         } else {
             component = getComponent(name);
         }
+        if (component == null && injectComponent.nullProtect()) {
+            component = InterfaceProxy.make(componentType);
+        }
         if (component != null) {
             if (!field.isAccessible())
                 field.setAccessible(true);
@@ -199,6 +203,9 @@ public class ComponentManager {
             value = providerValue(component, field, null);
         } else {
             value = providerValue(component, field, null, inject.args());
+        }
+        if (value == null && inject.nullProtect()) {
+            value = InterfaceProxy.make(field.getType());
         }
         if (value == null)
             return;
@@ -227,6 +234,9 @@ public class ComponentManager {
             value = providerValue(component, field, componentImpl);
         } else {
             value = providerValue(component, field, componentImpl, inject.args());
+        }
+        if (value == null && inject.nullProtect()) {
+            value = InterfaceProxy.make(field.getType());
         }
         if (value == null)
             return;
