@@ -46,14 +46,12 @@ dependencies {
 ```  
 ## 混淆  
 ```  
--ignorewarning
 -keepattributes *Annotation*
 #保留部分泛型信息，必要!
 -keepattributes Signature
 #手动启用support keep注解
 #http://tools.android.com/tech-docs/support-annotations
 -dontskipnonpubliclibraryclassmembers
--printconfiguration
 -keep,allowobfuscation @interface android.support.annotation.Keep
 
 -keep @android.support.annotation.Keep class * {
