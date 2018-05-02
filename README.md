@@ -3,9 +3,6 @@
 
  [ ![Download](https://api.bintray.com/packages/ganyao114/maven/lib/images/download.svg) ](https://bintray.com/ganyao114/maven/lib/_latestVersion)
 # 2.配置
-## 关闭 Instant Run  
-Setting->Build->Instant Run  
-此项功能与 AspectJ(本项目依赖 AsoectJ) 冲突  
 ## Gradle  
 根目录/build.gradle  
 ```
@@ -16,8 +13,7 @@ buildscript {
     dependencies {
         ...
         //此依赖用于实现 AspectJ,如有其他合适项目可以自行替换，现由 https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx 实现
-        classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:1.1.1'
-        classpath 'org.aspectj:aspectjtools:1.8.13'
+        classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.0'
         ...
     }
 }  
