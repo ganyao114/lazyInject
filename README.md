@@ -5,7 +5,7 @@
 # 2.配置
 ## Gradle  
 根目录/build.gradle  
-```
+```groovy
 buildscript {
     
     ...
@@ -32,7 +32,7 @@ allprojects {
 
 ```
 app 或者 lib/build.gradle
-```
+```groovy
 //同上：如有其他 AspectJ 实现请自行替换
 apply plugin: 'android-aspectjx'
 
@@ -45,7 +45,7 @@ dependencies {
 
 ```  
 ## 混淆  
-```  
+```proguard
 -keepattributes *Annotation*
 #保留部分泛型信息，必要!
 -keepattributes Signature
@@ -77,7 +77,7 @@ dependencies {
 ## Component  
 &nbsp;&nbsp;参考 Dagger2，在 LazyInject 中 Component 为注入容器。  
 ### Component 定义  
-```
+```java
 @Component
 public interface TestComponent {
     @Provide
@@ -96,7 +96,7 @@ public interface TestComponent {
 ```
 &nbsp;&nbsp;打上 @Provide 注解的方法将被暴露为依赖的提供者，注意 LazyInject 和 Dagger2 不同的是没有实现 Scope 管理，注入元素需要在 Component 的实现类中自行管理。简单理解为每次注入都会调用对应的 provide 方法。
 ### Component 实现
-```
+```java
 @ComponentImpl
 public class TestComponentImpl implements TestComponent {
     @Override
@@ -125,7 +125,7 @@ public class TestComponentImpl implements TestComponent {
     }
 }
 ```
-```
+```java
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PACKAGE, ElementType.TYPE})
 public @interface ComponentImpl {
@@ -140,7 +140,7 @@ public @interface ComponentImpl {
 ### Component 管理
 &nbsp;&nbsp;Component 默认在进程中全局单例
 ####手动管理
-```
+```java
 LazyInject.registerComponent(component, instance);
 LazyInject.getComponent(component, instance);
 LazyInject.removeComponent(component, instance);
@@ -148,7 +148,7 @@ LazyInject.removeComponent(component, instance);
 #### 自动管理
 ##### 编写 BuildMap
 &nbsp;&nbsp;为了让框架找到对应 Component 的构造方法，你需要实现一个完全由对应静态方法构成的类，该类默认会由注解处理器自动生成
-```
+```java
 @Keep
 public class Auto_ComponentBuildMap {
   public static TestComponent buildTestComponentImpl() {
@@ -157,7 +157,7 @@ public class Auto_ComponentBuildMap {
 }
 ```
 &nbsp;&nbsp;需要做的就是在 Application 初始化时调用
-```
+```java
 public class DemoApplication extends Application {
     @Override
     public void onCreate() {
@@ -172,7 +172,7 @@ public class DemoApplication extends Application {
 &nbsp;&nbsp;主动注入的原理是利用 AspectJ 编译时 hook field get 操作。所以注入是被动的。  
 &nbsp;&nbsp;除了加上 @Inject 注解并不需要做其他操作。
 #### @Inject
-```
+```java
 @Target(FIELD)
 @Retention(RUNTIME)
 public @interface Inject {
@@ -199,7 +199,7 @@ String[] args() default {};
 boolean nullProtect() default false;  
 
 Example
-```
+```java
 public class MainActivity extends AppCompatActivity {
 
     @Inject(component = TestComponent.class)
@@ -239,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
 &nbsp;&nbsp;@InjectComponent 注解用于注入 Component 容器。  
 
 &nbsp;&nbsp;一般使用 MVP 时常用到。
-```
+```java
 public interface LoginMVP {
     interface View {
         void loginSuccess();
@@ -265,7 +265,7 @@ public interface LoginMVP {
 }
 ```
 
-```
+```java
 //Presenter 不 cache
 @ComponentImpl(cache = false, name = "Product")
 public class LoginPresenter implements LoginMVP.Presenter {
@@ -285,7 +285,7 @@ public class LoginPresenter implements LoginMVP.Presenter {
 }
 ```
 
-```
+```java
 public class LoginActivity extends AppCompatActivity implements LoginMVP.View {
     @InjectComponent
     LoginMVP.Presenter loginPresenter;
@@ -316,19 +316,19 @@ public class LoginActivity extends AppCompatActivity implements LoginMVP.View {
 &nbsp;&nbsp;不支持 alwaysRefresh
 ### Kotlin Support
 #### 使用 Kotlin 特性动态代理
-```
+```kotlin
 val map: Map<Any,Any> by provideElement(TestComponent::class)
 ```
 &nbsp;&nbsp;缺点在于不能混淆,混淆会丢失类型元数据，请等待 proguard 修复，从设计角度来说 kotlin side 难以修复。  
 &nbsp;&nbsp;case:https://youtrack.jetbrains.com/issue/KT-21869  
 #### 继续使用注解，和 Java 类似
-```
+```kotlin
 @Provide(component = TestComponent::class, alwaysRefresh = true)
 var strs: List<String>? = null;
 ```
 ## Build 配置
 &nbsp;&nbsp;对应子 Module/build.gradle
-```
+```groovy
 android {
     ...
     defaultConfig {
@@ -346,10 +346,9 @@ android {
 
 ## Debug 开关
 &nbsp;&nbsp;打开将显示 log  
-```
+```java
 LazyInject.setDebug(true);
 ```
-
 
 # Email
 939543405@qq.com  
