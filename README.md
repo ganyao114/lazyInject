@@ -348,7 +348,10 @@ android {
 &nbsp;&nbsp;打开将显示 log  
 ```java
 LazyInject.setDebug(true);
-```
+```  
+
+# 实现原理  
+[Design Document](https://github.com/ganyao114/lazyInject/blob/master/doc/di_design.md)
 
 # Email
 939543405@qq.com  
