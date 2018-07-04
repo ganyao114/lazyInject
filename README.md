@@ -125,8 +125,7 @@ public class TestComponentImpl implements TestComponent {
     }
 }
 ```
-```java
-@Retention(RetentionPolicy.RUNTIME)
+```java@Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PACKAGE, ElementType.TYPE})
 public @interface ComponentImpl {
     String component() default "";
@@ -168,8 +167,8 @@ public class DemoApplication extends Application {
 ```
 &nbsp;&nbsp;当然也可以模仿这个手动编写
 ## 注入
-### 主动注入
-&nbsp;&nbsp;主动注入的原理是利用 AspectJ 编译时 hook field get 操作。所以注入是被动的。  
+### 被动注入
+&nbsp;&nbsp;被动注入的原理是利用 AspectJ 编译时 hook field get 操作。所以注入是被动的。  
 &nbsp;&nbsp;除了加上 @Inject 注解并不需要做其他操作。
 #### @Inject
 ```java
