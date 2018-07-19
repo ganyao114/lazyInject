@@ -1,5 +1,7 @@
 package com.trend.lazyinject.lib.cache;
 
+import com.trend.lazyinject.lib.provider.IProvider;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -12,14 +14,14 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ProviderCache {
 
 
-    public Map<Type,Method> cache = new ConcurrentHashMap<>();
+    public Map<Type,IProvider> cache = new ConcurrentHashMap<>();
 
-    public Method getProvider(Type type) {
+    public IProvider getProvider(Type type) {
         return cache.get(type);
     }
 
-    public void addProvider(Type type, Method method) {
-        cache.put(type, method);
+    public void addProvider(Type type, IProvider provider) {
+        cache.put(type, provider);
     }
 
 }

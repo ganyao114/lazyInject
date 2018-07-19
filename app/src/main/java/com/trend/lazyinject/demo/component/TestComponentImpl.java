@@ -15,6 +15,11 @@ import java.util.Map;
  */
 @ComponentImpl
 public class TestComponentImpl implements TestComponent {
+
+    public TestComponentImpl() {
+    }
+
+
     @DebugLog
     @Override
     public List<String> provide1() {
@@ -32,7 +37,7 @@ public class TestComponentImpl implements TestComponent {
     }
     @DebugLog
     @Override
-    public ModelA provide4() {
+    public ModelA provide4(Map strings) {
         return new ModelA();
     }
     @DebugLog

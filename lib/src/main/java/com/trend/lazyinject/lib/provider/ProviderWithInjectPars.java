@@ -1,0 +1,102 @@
+package com.trend.lazyinject.lib.provider;
+
+import com.trend.lazyinject.annotation.Inject;
+import com.trend.lazyinject.lib.di.DIImpl;
+import com.trend.lazyinject.lib.proxy.InterfaceProxy;
+import com.trend.lazyinject.lib.utils.ReflectUtils;
+import com.trend.lazyinject.lib.utils.ValidateUtil;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+
+public class ProviderWithInjectPars extends DefaultProvider {
+
+    ProviderInfo[] providerInfos;
+
+    public ProviderWithInjectPars(Method providerMethod, ProviderInfo[] providerInfos) {
+        super(providerMethod);
+        this.providerInfos = providerInfos;
+    }
+
+    @Override
+    public Object provide(Object component, String... args) throws Throwable {
+        Object[] pars = new Object[providerInfos.length];
+        int curString = 0;
+        for (int i = 0;i < pars.length;i ++) {
+            ProviderInfo providerInfo = providerInfos[i];
+            if (providerInfo == null) {
+
+            } else if (providerInfo.isStringArg) {
+                if (!ValidateUtil.isEmpty(args) && curString < args.length) {
+                    pars[i] = args[curString];
+                    curString++;
+                }
+            } else {
+                Class<?> componentType = providerInfo.inject.component();
+                if (componentType == Inject.None.class) {
+                    componentType = ReflectUtils.getRawType(providerInfo.type).getEnclosingClass();
+                    if (componentType == null || componentType == Object.class)
+                        continue;
+                }
+                Object value = DIImpl.providerValue(componentType, providerInfo.type, providerInfo.inject.args());
+                if (value == null && providerInfo.inject.nullProtect()) {
+                    value = InterfaceProxy.make(ReflectUtils.getRawType(providerInfo.type));
+                }
+                pars[i] = value;
+            }
+        }
+        return providerMethod.invoke(component, pars);
+    }
+
+    public static class ProviderInfo {
+
+        public boolean isStringArg = false;
+        public Type type;
+        public Inject inject;
+
+        public ProviderInfo() {
+            isStringArg = true;
+        }
+
+        public ProviderInfo(Type type, Inject inject) {
+            this.type = type;
+            this.inject = inject;
+        }
+    }
+
+    public static class FakeInject implements Inject {
+
+        Class<?> component;
+
+        public FakeInject(Class<?> component) {
+            this.component = component;
+        }
+
+        @Override
+        public Class<?> component() {
+            return component;
+        }
+
+        @Override
+        public boolean alwaysRefresh() {
+            return false;
+        }
+
+        @Override
+        public String[] args() {
+            return new String[0];
+        }
+
+        @Override
+        public boolean nullProtect() {
+            return false;
+        }
+
+        @Override
+        public Class<? extends Annotation> annotationType() {
+            return Inject.class;
+        }
+    }
+
+}

@@ -67,9 +67,9 @@ public class InjectAspect {
         if (component == null)
             return null;
         if (ValidateUtil.isEmpty(args))
-            res = ComponentManager.providerValue(component, field, null);
+            res = DIImpl.providerValue(component, field, null);
         else
-            res = ComponentManager.providerValue(component, field, null, (Object[]) args);
+            res = DIImpl.providerValue(component, field, null, args);
         return res;
     }
 

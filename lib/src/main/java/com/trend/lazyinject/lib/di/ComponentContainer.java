@@ -1,6 +1,7 @@
-package com.trend.lazyinject.lib.component;
+package com.trend.lazyinject.lib.di;
 
 import com.trend.lazyinject.annotation.DebugLog;
+import com.trend.lazyinject.lib.provider.IProvider;
 import com.trend.lazyinject.lib.utils.ReflectUtils;
 
 import java.lang.reflect.Method;
@@ -15,7 +16,7 @@ import java.util.Map;
 public class ComponentContainer {
 
     private Class componentType;
-    private Map<Type,Method> providers = new HashMap<>();
+    private Map<Type,IProvider> providers = new HashMap<>();
 
 
     public Class getComponentType() {
@@ -26,22 +27,22 @@ public class ComponentContainer {
         this.componentType = componentType;
     }
 
-    public void addProvider(Type type, Method method) {
-        providers.put(type, method);
+    public void addProvider(Type type, IProvider provider) {
+        providers.put(type, provider);
     }
 
     @DebugLog
-    public Method getProvider(Type type) {
-        Method method = providers.get(type);
-        if (method == null) {
+    public IProvider getProvider(Type type) {
+        IProvider provider = providers.get(type);
+        if (provider == null) {
             for (Type key : providers.keySet()) {
                 if (ReflectUtils.canCast(type, key)) {
-                    method = providers.get(key);
+                    provider = providers.get(key);
                     break;
                 }
             }
         }
-        return method;
+        return provider;
     }
 
 }
