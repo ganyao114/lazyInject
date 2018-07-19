@@ -1,6 +1,7 @@
 package com.trend.lazyinject.kotlinsupport
 
 import com.trend.lazyinject.lib.component.ComponentManager
+import com.trend.lazyinject.lib.di.DIImpl
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -48,9 +49,9 @@ private class ElementProvider<R,T>(component: Any = None::class, alwaysRefresh: 
                 return value as T;
             }
             if (component is Class<*>) {
-                value = ComponentManager.providerValue(component as Class<*>, property.javaGetter?.genericReturnType, args);
+                value = DIImpl.providerValue(component as Class<*>, property.javaGetter?.genericReturnType, args);
             } else if (component is KClass<*>) {
-                value = ComponentManager.providerValue((component as KClass<*>).java, property.javaGetter?.genericReturnType, args);
+                value = DIImpl.providerValue((component as KClass<*>).java, property.javaGetter?.genericReturnType, args);
             }
         }
         @Suppress("UNCHECKED_CAST")
@@ -76,9 +77,9 @@ private class ElementProviderNoArgs<R,T>(component: Any = None::class, alwaysRef
                 return value as T;
             }
             if (component is Class<*>) {
-                value = ComponentManager.providerValue(component as Class<*>, property.javaGetter?.genericReturnType);
+                value = DIImpl.providerValue(component as Class<*>, property.javaGetter?.genericReturnType, null);
             } else if (component is KClass<*>) {
-                value = ComponentManager.providerValue((component as KClass<*>).java, property.javaGetter?.genericReturnType);
+                value = DIImpl.providerValue((component as KClass<*>).java, property.javaGetter?.genericReturnType, null);
             }
         }
         @Suppress("UNCHECKED_CAST")

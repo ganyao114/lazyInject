@@ -162,6 +162,11 @@ public class DIImpl {
         }
     }
 
+    @DebugLog
+    public static Object providerValue(Class componentType, Type fieldType, Object... args) {
+        return providerValue(componentType, fieldType, (String[]) args);
+    }
+
     private static IProvider doGetProvider(Class componentType, Type fieldType) {
         ProviderCache cache = providerCache.get(componentType);
         if (cache == null) {
