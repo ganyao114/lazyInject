@@ -3,6 +3,7 @@ package com.trend.lazyinject.lib.component;
 import com.trend.lazyinject.annotation.DebugLog;
 import com.trend.lazyinject.annotation.NoCache;
 import com.trend.lazyinject.lib.di.DIImpl;
+import com.trend.lazyinject.lib.exception.ComponentBuildException;
 import com.trend.lazyinject.lib.log.LOG;
 import com.trend.lazyinject.lib.thread.ThreadPool;
 
@@ -64,14 +65,15 @@ public class ComponentBuilder {
     @DebugLog
     public static <T> BuildWrapper<T> buildWrapper(Class<T> componentType) {
         Method builderMethod = builders.get(getRawType(componentType));
-        if (builderMethod == null)
+        if (builderMethod == null) {
+            LOG.LOGE(TAG, "can not find component type: " + componentType.getName() + " ,did you register?");
             return null;
+        }
         T component = null;
         try {
             component = (T) builderMethod.invoke(null);
         } catch (Exception e) {
-            LOG.LOGE(TAG, "build component " + componentType.getName() + " error!", e);
-            return null;
+            throw new ComponentBuildException("build component " + componentType.getName() + " error!", e);
         }
         if (component == null)
             return null;
