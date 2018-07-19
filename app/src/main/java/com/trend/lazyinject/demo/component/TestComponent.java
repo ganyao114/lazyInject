@@ -2,6 +2,7 @@ package com.trend.lazyinject.demo.component;
 
 import com.trend.lazyinject.annotation.Component;
 import com.trend.lazyinject.annotation.Inject;
+import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.annotation.Provide;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.ModelA;
@@ -23,7 +24,7 @@ public interface TestComponent<T extends Serializable & List> {
     @Provide
     ArrayList<? extends BaseModel> provide3();
     @Provide
-    ModelA provide4(@Inject Map<String,BaseModel> strings);
+    ModelA provide4(Map<String,BaseModel> strings,String test ,@InjectComponent TestComponent testComponent);
     @Provide
     Map<String,BaseModel> provide5();
     @Provide

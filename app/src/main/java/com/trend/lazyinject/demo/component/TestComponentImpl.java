@@ -2,6 +2,7 @@ package com.trend.lazyinject.demo.component;
 
 import com.trend.lazyinject.annotation.ComponentImpl;
 import com.trend.lazyinject.annotation.DebugLog;
+import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.ModelA;
 
@@ -37,7 +38,7 @@ public class TestComponentImpl implements TestComponent {
     }
     @DebugLog
     @Override
-    public ModelA provide4(Map strings) {
+    public ModelA provide4(Map strings,String test , TestComponent testComponent) {
         return new ModelA();
     }
     @DebugLog

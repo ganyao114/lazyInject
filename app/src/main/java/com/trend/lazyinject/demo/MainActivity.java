@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     public static TestComponent testComponent;
     @Inject(component = TestComponent.class)
     List<String> strings;
-    @Inject(component = TestComponent.class)
+    @Inject(component = TestComponent.class, args = {"test"})
     BaseModel baseModel;
     @Inject(component = TestComponent.class)
     Map<String, ? extends Collection> map;

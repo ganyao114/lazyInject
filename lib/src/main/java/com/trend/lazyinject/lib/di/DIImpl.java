@@ -67,17 +67,23 @@ public class DIImpl {
                         ProviderWithInjectPars.ProviderInfo info = null;
                         Annotation[] annos = annotations[i];
                         Inject inject = null;
+                        InjectComponent injectComponent = null;
                         if (!ValidateUtil.isEmpty(annos)) {
                             for (Annotation anno : annos) {
                                 if (anno != null && anno instanceof Inject) {
                                     inject = (Inject) anno;
+                                } else if (anno != null && anno instanceof InjectComponent) {
+                                    injectComponent = (InjectComponent) anno;
                                 }
                             }
                         }
                         if (inject != null) {
                             isInject = true;
                             info = new ProviderWithInjectPars.ProviderInfo(par, inject);
-                        } else if (String.class.equals(par)) {
+                        } else if (injectComponent != null) {
+                            isInject = true;
+                            info = new ProviderWithInjectPars.ProviderInfo(par, injectComponent);
+                        }else if (String.class.equals(par)) {
                             info = new ProviderWithInjectPars.ProviderInfo();
                         } else {
                             isInject = true;

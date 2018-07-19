@@ -1,6 +1,8 @@
 package com.trend.lazyinject.lib.provider;
 
 import com.trend.lazyinject.annotation.Inject;
+import com.trend.lazyinject.annotation.InjectComponent;
+import com.trend.lazyinject.lib.component.ComponentManager;
 import com.trend.lazyinject.lib.di.DIImpl;
 import com.trend.lazyinject.lib.proxy.InterfaceProxy;
 import com.trend.lazyinject.lib.utils.ReflectUtils;
@@ -27,12 +29,12 @@ public class ProviderWithInjectPars extends DefaultProvider {
             ProviderInfo providerInfo = providerInfos[i];
             if (providerInfo == null) {
 
-            } else if (providerInfo.isStringArg) {
+            } else if (providerInfo.providerType == ProviderType.String) {
                 if (!ValidateUtil.isEmpty(args) && curString < args.length) {
                     pars[i] = args[curString];
                     curString++;
                 }
-            } else {
+            } else if (providerInfo.providerType == ProviderType.Inject){
                 Class<?> componentType = providerInfo.inject.component();
                 if (componentType == Inject.None.class) {
                     componentType = ReflectUtils.getRawType(providerInfo.type).getEnclosingClass();
@@ -44,6 +46,12 @@ public class ProviderWithInjectPars extends DefaultProvider {
                     value = InterfaceProxy.make(ReflectUtils.getRawType(providerInfo.type));
                 }
                 pars[i] = value;
+            } else {
+                Object value = ComponentManager.getComponent(ReflectUtils.getRawType(providerInfo.type));
+                if (value == null && providerInfo.injectComponent.nullProtect()) {
+                    value = InterfaceProxy.make(ReflectUtils.getRawType(providerInfo.type));
+                }
+                pars[i] = value;
             }
         }
         return providerMethod.invoke(component, pars);
@@ -51,18 +59,33 @@ public class ProviderWithInjectPars extends DefaultProvider {
 
     public static class ProviderInfo {
 
-        public boolean isStringArg = false;
+        public ProviderType providerType = ProviderType.Inject;
+
         public Type type;
         public Inject inject;
+        public InjectComponent injectComponent;
 
         public ProviderInfo() {
-            isStringArg = true;
+            providerType = ProviderType.String;
+        }
+
+        public ProviderInfo(Type componentType, InjectComponent injectComponent) {
+            providerType = ProviderType.InjectComponent;
+            this.type = componentType;
+            this.injectComponent = injectComponent;
         }
 
         public ProviderInfo(Type type, Inject inject) {
+            providerType = ProviderType.Inject;
             this.type = type;
             this.inject = inject;
         }
+    }
+
+    public enum ProviderType {
+        String,
+        Inject,
+        InjectComponent
     }
 
     public static class FakeInject implements Inject {
