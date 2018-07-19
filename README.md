@@ -13,7 +13,7 @@ buildscript {
     dependencies {
         ...
         //此依赖用于实现 AspectJ,如有其他合适项目可以自行替换，现由 https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx 实现
-        classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.0'
+        classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.1'
         ...
     }
 }  
@@ -37,10 +37,10 @@ app 或者 lib/build.gradle
 apply plugin: 'android-aspectjx'
 
 dependencies {
-    compile 'com.trend.lazyinject:lib:0.0.6-beta'
-    annotationProcessor 'com.trend.lazyinject:compiler:0.0.6-beta'
+    compile 'com.trend.lazyinject:lib:0.0.7-beta'
+    annotationProcessor 'com.trend.lazyinject:compiler:0.0.7-beta'
     //如果使用 kotlin
-    compile 'com.trend.lazyinject:kotlinsupport:0.0.6-beta'
+    compile 'com.trend.lazyinject:kotlinsupport:0.0.7-beta'
 }
 
 ```  
