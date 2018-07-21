@@ -37,10 +37,10 @@ app 或者 lib/build.gradle
 apply plugin: 'android-aspectjx'
 
 dependencies {
-    compile 'com.trend.lazyinject:lib:0.0.7-beta'
-    annotationProcessor 'com.trend.lazyinject:compiler:0.0.7-beta'
+    compile 'com.trend.lazyinject:lib:1.0.0'
+    annotationProcessor 'com.trend.lazyinject:compiler:1.0.0'
     //如果使用 kotlin
-    compile 'com.trend.lazyinject:kotlinsupport:0.0.7-beta'
+    compile 'com.trend.lazyinject:kotlinsupport:1.0.0'
 }
 
 ```  
@@ -86,7 +86,7 @@ public interface TestComponent {
     ArrayList<Integer> provide2();
     @Provide
     ArrayList<? extends BaseModel> provide3();
-    @Provide
+    @Provide(singleton = true)
     ModelA provide4();
     @Provide
     Map<String,BaseModel> provide5();
@@ -94,7 +94,7 @@ public interface TestComponent {
     Map<String, ? extends ModelA> provide6();
 }
 ```
-&nbsp;&nbsp;打上 @Provide 注解的方法将被暴露为依赖的提供者，注意 LazyInject 和 Dagger2 不同的是没有实现 Scope 管理，注入元素需要在 Component 的实现类中自行管理。简单理解为每次注入都会调用对应的 provide 方法。
+&nbsp;&nbsp;打上 @Provide 注解的方法将被暴露为依赖的提供者，每个 provide 方法可单独配置为 singleton
 ### Component 实现
 ```java
 @ComponentImpl
