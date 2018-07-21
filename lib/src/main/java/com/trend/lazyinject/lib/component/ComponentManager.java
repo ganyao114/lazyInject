@@ -27,7 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ComponentManager {
 
     private static final String TAG = "ComponentManager";
-    public static Map<Object,Object> components = new ConcurrentHashMap<>();
+    public static Map<Class,Object> components = new ConcurrentHashMap<>();
+    public static Map<Object,Singletons> singletonsMap = new ConcurrentHashMap<>();
 
     private static Map<String,Class> typeMap = new ConcurrentHashMap<>();
 
@@ -48,6 +49,7 @@ public class ComponentManager {
         }
         components.put(type, instance);
         if (cacheProvider) {
+            singletonsMap.put(instance, new Singletons());
             ComponentBuilder.registerProviderAsync(type);
         }
     }
@@ -76,7 +78,7 @@ public class ComponentManager {
                 if (wrapper != null) {
                     t = wrapper.component;
                     if (!wrapper.noCache) {
-                        registerComponent(type, t, false);
+                        registerComponent(type, t, true);
                     }
                 }
             }
@@ -95,6 +97,7 @@ public class ComponentManager {
         synchronized (type) {
             Object o = components.remove(type);
             if (o != null) {
+                singletonsMap.remove(o);
                 if (o instanceof IComponentDestroy) {
                     Destroyed destroyed = ((IComponentDestroy) o).onComponentDestroyed();
                     destroyed.isDestroyed = true;

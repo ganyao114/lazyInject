@@ -14,7 +14,7 @@ public class StringArgsProvider extends DefaultProvider {
     }
 
     @Override
-    public Object provide(Object component, String... args) throws Throwable {
+    public Object doProvide(Object component, String... args) throws Throwable {
         if (!ValidateUtil.isEmpty(args)) {
             return providerMethod.invoke(component, initStrings(args));
         } else {

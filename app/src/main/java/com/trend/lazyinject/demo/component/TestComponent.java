@@ -23,7 +23,7 @@ public interface TestComponent<T extends Serializable & List> {
     ArrayList<Integer> provide2();
     @Provide
     ArrayList<? extends BaseModel> provide3();
-    @Provide
+    @Provide(singleton = true)
     ModelA provide4(Map<String,BaseModel> strings,String test ,@InjectComponent TestComponent testComponent);
     @Provide
     Map<String,BaseModel> provide5();

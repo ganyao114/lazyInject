@@ -22,7 +22,7 @@ public class ProviderWithInjectPars extends DefaultProvider {
     }
 
     @Override
-    public Object provide(Object component, String... args) throws Throwable {
+    public Object doProvide(Object component, String... args) throws Throwable {
         Object[] pars = new Object[providerInfos.length];
         int curString = 0;
         for (int i = 0;i < pars.length;i ++) {

@@ -49,7 +49,8 @@ public class DIImpl {
             container = new ComponentContainer();
             container.setComponentType(component);
             for (Method method : component.getMethods()) {
-                if (!method.isAnnotationPresent(Provide.class))
+                Provide provide = method.getAnnotation(Provide.class);
+                if (provide == null)
                     continue;
                 Type retType = method.getGenericReturnType();
                 if (retType == null || retType.equals(Void.TYPE) || filterBase(method))
@@ -97,6 +98,7 @@ public class DIImpl {
                         provider = new StringArgsProvider(method, pars.length);
                     }
                 }
+                provider.setSingleton(provide.singleton());
                 container.addProvider(retType, provider);
             }
             return container;
