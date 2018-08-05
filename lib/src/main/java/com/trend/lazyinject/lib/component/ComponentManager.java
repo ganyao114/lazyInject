@@ -3,19 +3,9 @@ package com.trend.lazyinject.lib.component;
 import android.text.TextUtils;
 
 import com.trend.lazyinject.annotation.DebugLog;
-import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.Name;
-import com.trend.lazyinject.annotation.InjectComponent;
-import com.trend.lazyinject.lib.cache.ProviderCache;
-import com.trend.lazyinject.lib.di.ComponentContainer;
-import com.trend.lazyinject.lib.di.DIImpl;
-import com.trend.lazyinject.lib.log.LOG;
-import com.trend.lazyinject.lib.proxy.InterfaceProxy;
 import com.trend.lazyinject.lib.utils.ValidateUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

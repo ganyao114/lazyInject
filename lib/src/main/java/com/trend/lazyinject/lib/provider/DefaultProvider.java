@@ -52,4 +52,9 @@ public class DefaultProvider implements IProvider {
         this.singleton = singleton;
     }
 
+    @Override
+    public String key() {
+        return providerMethod.toGenericString();
+    }
+
 }
