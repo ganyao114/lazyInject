@@ -17,6 +17,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <service android:name="com.trend.lazyinject.lib.ipc.IPCService"
+            android:process=":p1">
+
+        </service>
+
+        <provider
+            android:authorities="test"
+            android:name="com.trend.lazyinject.lib.ipc.InjectIPCProvider"
+            android:process=":p1" />
+
     </application>
 
 </manifest>

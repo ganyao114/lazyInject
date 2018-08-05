@@ -9,7 +9,12 @@ import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.demo.component.TestComponent;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.NullProtectTestA;
+import com.trend.lazyinject.lib.ipc.IPCService;
+import com.trend.lazyinject.lib.ipc.InjectIPCProviderClient;
+import com.trend.lazyinject.lib.ipc.InjectIPCServiceClient;
+import com.trend.lazyinject.lib.ipc.LazyInjectIPC;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -61,5 +66,10 @@ public class MainActivity extends AppCompatActivity {
             nullProtectTestA2.test1();
             nullProtectTestA2.test2("....");
         }
+        LazyInjectIPC client = new InjectIPCProviderClient("test");
+        new Thread(() -> {
+            Serializable serializable = client.remoteProvide(MainActivity.class, getClass().getMethods()[0].toGenericString(), new String[]{"2", "1"});
+            Log.e("res", serializable.toString());
+        }).start();
     }
 }

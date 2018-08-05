@@ -49,6 +49,7 @@ public class DIImpl {
             container = new ComponentContainer();
             container.setComponentType(component);
             for (Method method : component.getMethods()) {
+                container.addMethod(method);
                 Provide provide = method.getAnnotation(Provide.class);
                 if (provide == null)
                     continue;
