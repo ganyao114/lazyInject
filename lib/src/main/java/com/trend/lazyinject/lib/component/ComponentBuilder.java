@@ -106,6 +106,8 @@ public class ComponentBuilder {
                     container.setNeedIPC(true);
                     InjectIPCClientManager.setIPCProcess(componentType, component.process());
                 }
+                if (!componentType.isInterface())
+                    throw new ComponentBuildException(componentType.getName() + " - component must be a interface when invoke ipc!");
                 return InterfaceProxy.make(componentType, new IPCInvokeHandler(componentType));
             }
         }
