@@ -18,6 +18,7 @@ import com.trend.lazyinject.lib.provider.StringArgsProvider;
 import com.trend.lazyinject.lib.proxy.InterfaceProxy;
 import com.trend.lazyinject.lib.utils.ValidateUtil;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -60,7 +61,7 @@ public class DIImpl {
                 Type[] pars = method.getGenericParameterTypes();
                 Annotation[][] annotations = method.getParameterAnnotations();
                 if (ValidateUtil.isEmpty(pars)) {
-                    provider = new DefaultProvider(method);
+                    provider = new DefaultProvider(component, method);
                 } else {
                     ProviderWithInjectPars.ProviderInfo[] providerInfos = new ProviderWithInjectPars.ProviderInfo[pars.length];
                     boolean isInject = false;
@@ -94,14 +95,15 @@ public class DIImpl {
                         providerInfos[i] = info;
                     }
                     if (isInject) {
-                        provider = new ProviderWithInjectPars(method, providerInfos);
+                        provider = new ProviderWithInjectPars(component, method, providerInfos);
                     } else {
-                        provider = new StringArgsProvider(method, pars.length);
+                        provider = new StringArgsProvider(component, method, pars.length);
                     }
                 }
                 provider.setSingleton(provide.singleton());
                 container.addProvider(retType, provider);
             }
+            dis.put(component, container);
             return container;
         }
     }
@@ -161,6 +163,44 @@ public class DIImpl {
             return value;
         } catch (Throwable e) {
             LOG.LOGE("ComponentManager", "Component providerValue :" + fieldType.toString() + " get error!", e);
+            return null;
+        }
+    }
+
+    @DebugLog
+    public static Object providerValue(Class componentType, String providerKey, Object... args) {
+        ComponentContainer container = getProvider(componentType);
+        if (container == null)
+            return null;
+        IProvider provider = container.getProvider(providerKey);
+        if (provider == null)
+            return null;
+        Object component = ComponentManager.getComponent(componentType);
+        if (component == null)
+            return null;
+        try {
+            return provider.provideDirect(component, args);
+        } catch (Throwable e) {
+            LOG.LOGE("ComponentManager", "Component providerValue :" + providerKey + " get error!", e);
+            return null;
+        }
+    }
+
+    @DebugLog
+    public static Object invokeDirect(Class componentType, String methodKey, Object... args) {
+        ComponentContainer container = getProvider(componentType);
+        if (container == null)
+            return null;
+        Method method = container.getMethod(methodKey);
+        if (method == null)
+            return null;
+        Object component = ComponentManager.getComponent(componentType);
+        if (component == null)
+            return null;
+        try {
+            return method.invoke(component, args);
+        } catch (Throwable e) {
+            LOG.LOGE("ComponentManager", "Component invoke :" + methodKey + " error!", e);
             return null;
         }
     }

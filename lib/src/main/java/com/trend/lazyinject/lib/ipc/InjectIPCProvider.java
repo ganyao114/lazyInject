@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 public class InjectIPCProvider extends ContentProvider {
 
-    LazyInjectIPC service;
+    volatile LazyInjectIPC service;
 
     @Override
     public Bundle call(String method, String arg, Bundle bundle) {

@@ -39,7 +39,7 @@ public class ComponentManager {
         }
         components.put(type, instance);
         if (cacheProvider) {
-            singletonsMap.put(instance, new Singletons());
+            singletonsMap.put(type, new Singletons());
             ComponentBuilder.registerProviderAsync(type);
         }
     }
@@ -87,7 +87,7 @@ public class ComponentManager {
         synchronized (type) {
             Object o = components.remove(type);
             if (o != null) {
-                singletonsMap.remove(o);
+                singletonsMap.remove(type);
                 if (o instanceof IComponentDestroy) {
                     Destroyed destroyed = ((IComponentDestroy) o).onComponentDestroyed();
                     destroyed.isDestroyed = true;

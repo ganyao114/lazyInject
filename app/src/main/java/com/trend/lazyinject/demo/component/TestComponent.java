@@ -16,7 +16,7 @@ import java.util.Map;
  * Created by swift_gan on 2018/4/17.
  */
 @Component
-public interface TestComponent<T extends Serializable & List> {
+public interface TestComponent<T extends Serializable & List> extends Serializable {
     @Provide
     List<String> provide1();
     @Provide
@@ -24,7 +24,7 @@ public interface TestComponent<T extends Serializable & List> {
     @Provide
     ArrayList<? extends BaseModel> provide3();
     @Provide(singleton = true)
-    ModelA provide4(Map<String,BaseModel> strings,String test ,@InjectComponent TestComponent testComponent);
+    ModelA provide4(Map<String,BaseModel> strings,String test);
     @Provide
     Map<String,BaseModel> provide5();
     @Provide

@@ -66,10 +66,6 @@ public class MainActivity extends AppCompatActivity {
             nullProtectTestA2.test1();
             nullProtectTestA2.test2("....");
         }
-        LazyInjectIPC client = new InjectIPCProviderClient("test");
-        new Thread(() -> {
-            Serializable serializable = client.remoteProvide(MainActivity.class, getClass().getMethods()[0].toGenericString(), new String[]{"2", "1"});
-            Log.e("res", serializable.toString());
-        }).start();
+        Log.d("test", "BaseModel invoke success = " + testComponent.provide4(null, null));
     }
 }

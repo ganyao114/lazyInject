@@ -16,8 +16,8 @@ public class ProviderWithInjectPars extends DefaultProvider {
 
     ProviderInfo[] providerInfos;
 
-    public ProviderWithInjectPars(Method providerMethod, ProviderInfo[] providerInfos) {
-        super(providerMethod);
+    public ProviderWithInjectPars(Class componentType, Method providerMethod, ProviderInfo[] providerInfos) {
+        super(componentType, providerMethod);
         this.providerInfos = providerInfos;
     }
 
@@ -54,7 +54,7 @@ public class ProviderWithInjectPars extends DefaultProvider {
                 pars[i] = value;
             }
         }
-        return providerMethod.invoke(component, pars);
+        return invoke(component, pars);
     }
 
     public static class ProviderInfo {

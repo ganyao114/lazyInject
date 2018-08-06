@@ -314,7 +314,7 @@ public class LoginActivity extends AppCompatActivity implements LoginMVP.View {
 &nbsp;&nbsp;区别在于需要用户手动调用 LazyInject.inject(this);  
 &nbsp;&nbsp;不支持 alwaysRefresh
 
-### Provider 方法参数依赖注入  
+### Provider 方法参数依赖注入
 &nbsp;&nbsp;类似 Dagger Provider 方法可以带待注入的参数
 1. 如果不在参数列表上加 Inject 注解，则默认会在本模块中搜索合适的依赖
 2. 加上 Inject 或者 InjectComponent 则会注入对应模块的依赖，参考上面 Field 注入写法

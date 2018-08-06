@@ -5,6 +5,9 @@ import com.trend.lazyinject.annotation.DebugLog;
 import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.ModelA;
+import com.trend.lazyinject.lib.LazyInject;
+import com.trend.lazyinject.lib.log.LOG;
+import com.trend.lazyinject.lib.utils.ProcessUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +17,7 @@ import java.util.Map;
 /**
  * Created by swift_gan on 2018/4/17.
  */
-@ComponentImpl
+@ComponentImpl(process = "com.trend.lazyinject.demo.p1")
 public class TestComponentImpl implements TestComponent {
 
     public TestComponentImpl() {
@@ -38,8 +41,8 @@ public class TestComponentImpl implements TestComponent {
     }
     @DebugLog
     @Override
-    public ModelA provide4(Map strings,String test , TestComponent testComponent) {
-        return new ModelA();
+    public ModelA provide4(Map strings,String test) {
+        return new ModelA(ProcessUtils.getProcessName(LazyInject.context()));
     }
     @DebugLog
     @Override

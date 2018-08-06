@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by ganyao on 2017/12/4.
@@ -17,7 +18,7 @@ import java.util.Map;
 public class ComponentContainer implements Serializable {
 
     private Class componentType;
-    private Map<Type,IProvider> providers = new HashMap<>();
+    private Map<Type,IProvider> providers = new ConcurrentHashMap<>();
     private Map<String,IProvider> providersWithKey = new HashMap<>();
     private Map<String,Method> methods = new HashMap<>();
 
@@ -59,6 +60,12 @@ public class ComponentContainer implements Serializable {
 
     public IProvider getProvider(String key) {
         return providersWithKey.get(key);
+    }
+
+    public synchronized void setNeedIPC(boolean ipc) {
+        for (IProvider provider:providers.values()) {
+            provider.setIPC(ipc);
+        }
     }
 
 }
