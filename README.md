@@ -360,8 +360,26 @@ android {
 &nbsp;&nbsp;打开将显示 log  
 ```java
 LazyInject.setDebug(true);
-```  
+```
 
+## 实验性功能
+### 在子进程实现 Component
+依赖 2.0.0-beta 版本可以使用此 Feature
+代码在 multi_process 分支
+```java
+@ComponentImpl(process = "com.trend.lazyinject.demo.p1")
+public class TestComponentImpl implements TestComponent {
+    ...
+}
+```
+需要在 Manifest 中为子进程注册一个 StubProvider, authorities 必须与子进程名相同。注意不要 exported, 否则会有安全风险
+```xml
+<provider
+      android:authorities="com.trend.lazyinject.demo.p1"
+      android:name="com.trend.lazyinject.lib.ipc.InjectIPCProvider"
+      android:process="com.trend.lazyinject.demo.p1" />
+```
+因为需要 IPC，所以所有 Provider 方法的参数和返回值必须继承自 Serializable, 暂时不支持 Parcelable
 # 实现原理  
 [Design Document](https://github.com/ganyao114/lazyInject/blob/master/doc/di_design.md)
 
