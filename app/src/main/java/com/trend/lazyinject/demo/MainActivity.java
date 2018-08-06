@@ -9,12 +9,7 @@ import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.demo.component.TestComponent;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.NullProtectTestA;
-import com.trend.lazyinject.lib.ipc.IPCService;
-import com.trend.lazyinject.lib.ipc.InjectIPCProviderClient;
-import com.trend.lazyinject.lib.ipc.InjectIPCServiceClient;
-import com.trend.lazyinject.lib.ipc.LazyInjectIPC;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
