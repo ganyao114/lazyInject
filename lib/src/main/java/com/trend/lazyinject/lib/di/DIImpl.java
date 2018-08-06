@@ -101,6 +101,7 @@ public class DIImpl {
                 provider.setSingleton(provide.singleton());
                 container.addProvider(retType, provider);
             }
+            dis.put(component, container);
             return container;
         }
     }
