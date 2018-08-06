@@ -27,6 +27,22 @@ public class InjectIPCClientManager {
         }
     }
 
+    public static LazyInjectIPC getClient(String process, Class<? extends IPCService> service) {
+        if (TextUtils.isEmpty(process))
+            return null;
+        LazyInjectIPC ipc = ipcClients.get(process);
+        if (ipc != null)
+            return ipc;
+        synchronized (process.intern()) {
+            ipc = ipcClients.get(process);
+            if (ipc != null)
+                return ipc;
+            ipc = new InjectIPCServiceClient(service);
+            ipcClients.put(process, ipc);
+            return ipc;
+        }
+    }
+
     public static LazyInjectIPC getClient(Class component) {
         return getClient(getIPCProcess(component));
     }

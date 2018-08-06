@@ -17,7 +17,7 @@ public interface LazyInjectIPC {
     String KEY_ARGS = "ARGS";
     String KEY_RET = "RET";
 
-    Serializable remoteProvide(Class componenetType, String providerKey, Serializable[] args);
-    Serializable remoteInvoke(Class componenetType, String providerKey, Serializable[] args);
+    Serializable remoteProvide(Class componentType, String providerKey, Serializable[] args);
+    Serializable remoteInvoke(Class componentType, String providerKey, Serializable[] args);
 
 }

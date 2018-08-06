@@ -22,10 +22,10 @@ public class InjectIPCProviderClient implements LazyInjectIPC {
     }
 
     @Override
-    public Serializable remoteProvide(Class componenetType, String providerKey, Serializable[] args) {
+    public Serializable remoteProvide(Class componentType, String providerKey, Serializable[] args) {
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable(KEY_CTYPE, componenetType);
+        bundle.putSerializable(KEY_CTYPE, componentType);
         bundle.putString(KEY_PKEY, providerKey);
         bundle.putSerializable(KEY_ARGS, args);
 
@@ -40,10 +40,10 @@ public class InjectIPCProviderClient implements LazyInjectIPC {
     }
 
     @Override
-    public Serializable remoteInvoke(Class componenetType, String providerKey, Serializable[] args) {
+    public Serializable remoteInvoke(Class componentType, String providerKey, Serializable[] args) {
 
         Bundle bundle = new Bundle();
-        bundle.putSerializable(KEY_CTYPE, componenetType);
+        bundle.putSerializable(KEY_CTYPE, componentType);
         bundle.putString(KEY_PKEY, providerKey);
         bundle.putSerializable(KEY_ARGS, args);
 

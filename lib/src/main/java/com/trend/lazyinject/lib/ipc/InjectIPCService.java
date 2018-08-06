@@ -6,12 +6,12 @@ import java.io.Serializable;
 
 public class InjectIPCService implements LazyInjectIPC {
     @Override
-    public Serializable remoteProvide(Class componenetType, String providerKey, Serializable[] args) {
-        return (Serializable) DIImpl.providerValue(componenetType, providerKey, args);
+    public Serializable remoteProvide(Class componentType, String providerKey, Serializable[] args) {
+        return (Serializable) DIImpl.providerValue(componentType, providerKey, args);
     }
 
     @Override
-    public Serializable remoteInvoke(Class componenetType, String providerKey, Serializable[] args) {
-        return (Serializable) DIImpl.invokeDirect(componenetType, providerKey, args);
+    public Serializable remoteInvoke(Class componentType, String providerKey, Serializable[] args) {
+        return (Serializable) DIImpl.invokeDirect(componentType, providerKey, args);
     }
 }
