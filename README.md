@@ -364,7 +364,7 @@ LazyInject.setDebug(true);
 
 ## 实验性功能
 ### 在子进程实现 Component
-依赖 2.0.1-beta 版本可以使用此 Feature
+依赖 2.0.2-beta 版本可以使用此 Feature
 代码在 multi_process 分支
 ```java
 @ComponentImpl(process = "com.trend.lazyinject.demo.p1")
@@ -380,6 +380,7 @@ public class TestComponentImpl implements TestComponent {
       android:process="com.trend.lazyinject.demo.p1" />
 ```
 因为需要 IPC，所以所有 Provider 方法的参数和返回值必须继承自 Serializable/Parcelable/IBinder
+你也可以直接调用 Component 中的方法，这些都是支持 IPC 的
 # 实现原理  
 [Design Document](https://github.com/ganyao114/lazyInject/blob/master/doc/di_design.md)
 
