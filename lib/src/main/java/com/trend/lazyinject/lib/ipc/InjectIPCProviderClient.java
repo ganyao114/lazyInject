@@ -22,12 +22,13 @@ public class InjectIPCProviderClient implements LazyInjectIPC {
     }
 
     @Override
-    public Serializable remoteProvide(Class componentType, String providerKey, Serializable[] args) {
+    public Object remoteProvide(Class componentType, String providerKey, Object[] args) {
 
         Bundle bundle = new Bundle();
+
         bundle.putSerializable(KEY_CTYPE, componentType);
         bundle.putString(KEY_PKEY, providerKey);
-        bundle.putSerializable(KEY_ARGS, args);
+        BundleWrapper.wrapArgs(bundle, args);
 
         Bundle res = ContentProviderCompat.call(context, uri, OP_PROVIDE_S, null, bundle);
 
@@ -36,16 +37,17 @@ public class InjectIPCProviderClient implements LazyInjectIPC {
 
         res.setClassLoader(getClass().getClassLoader());
 
-        return res.getSerializable(KEY_RET);
+        return BundleWrapper.unWrapRet(res);
     }
 
     @Override
-    public Serializable remoteInvoke(Class componentType, String providerKey, Serializable[] args) {
+    public Object remoteInvoke(Class componentType, String providerKey, Object[] args) {
 
         Bundle bundle = new Bundle();
+
         bundle.putSerializable(KEY_CTYPE, componentType);
         bundle.putString(KEY_PKEY, providerKey);
-        bundle.putSerializable(KEY_ARGS, args);
+        BundleWrapper.wrapArgs(bundle, args);
 
         Bundle res = ContentProviderCompat.call(context, uri, OP_INVOKE_S, null, bundle);
 
@@ -54,7 +56,7 @@ public class InjectIPCProviderClient implements LazyInjectIPC {
 
         res.setClassLoader(getClass().getClassLoader());
 
-        return res.getSerializable(KEY_RET);
+        return BundleWrapper.unWrapRet(res);
     }
 
 

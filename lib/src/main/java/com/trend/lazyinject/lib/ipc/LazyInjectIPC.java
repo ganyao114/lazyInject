@@ -3,8 +3,6 @@ package com.trend.lazyinject.lib.ipc;
 
 // Declare any non-default types here with import statements
 
-import java.io.Serializable;
-
 public interface LazyInjectIPC {
 
     int OP_PROVIDE = 1;
@@ -17,7 +15,7 @@ public interface LazyInjectIPC {
     String KEY_ARGS = "ARGS";
     String KEY_RET = "RET";
 
-    Serializable remoteProvide(Class componentType, String providerKey, Serializable[] args);
-    Serializable remoteInvoke(Class componentType, String providerKey, Serializable[] args);
+    Object remoteProvide(Class componentType, String providerKey, Object[] args);
+    Object remoteInvoke(Class componentType, String providerKey, Object[] args);
 
 }

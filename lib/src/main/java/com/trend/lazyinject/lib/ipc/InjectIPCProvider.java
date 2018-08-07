@@ -21,12 +21,13 @@ public class InjectIPCProvider extends ContentProvider {
         bundle.setClassLoader(getClass().getClassLoader());
         Class componentType = (Class) bundle.getSerializable(LazyInjectIPC.KEY_CTYPE);
         String providerKey = bundle.getString(LazyInjectIPC.KEY_PKEY);
-        Serializable[] args = (Serializable[]) bundle.getSerializable(LazyInjectIPC.KEY_ARGS);
+        Object[] args = BundleWrapper.unWrapArgs(bundle);
 
         if (componentType == null || providerKey == null)
             return null;
 
-        Serializable ret = null;
+        Object ret = null;
+
         switch (method) {
             case LazyInjectIPC.OP_INVOKE_S:
                 ret = service.remoteInvoke(componentType, providerKey, args);
@@ -37,8 +38,7 @@ public class InjectIPCProvider extends ContentProvider {
         }
 
         if (ret != null) {
-            Bundle resBundle = new Bundle();
-            resBundle.putSerializable(LazyInjectIPC.KEY_RET, ret);
+            Bundle resBundle = BundleWrapper.wrapRet(ret);
             return resBundle;
         }
 

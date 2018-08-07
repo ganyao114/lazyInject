@@ -40,6 +40,14 @@ public class ValidateUtil {
         return false;
     }
 
+    public static boolean isEmpty(int[] ints) {
+        if (ints == null)
+            return true;
+        if (ints.length == 0)
+            return true;
+        return false;
+    }
+
     public static boolean isEmpty(Map map) {
         if (map == null)
             return true;

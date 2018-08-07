@@ -3,6 +3,8 @@ package com.trend.lazyinject.demo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.InjectComponent;
@@ -14,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     @Inject(component = TestComponent.class)
     public static List<Integer> integers;
@@ -33,10 +35,18 @@ public class MainActivity extends AppCompatActivity {
     @Inject(nullProtect = true)
     NullProtectTestA nullProtectTestA2;
 
+    Button btnInject;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        btnInject = findViewById(R.id.btn_inject);
+        btnInject.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View view) {
         if (integers != null) {
             Log.d("test", "List<Integer> inject success = " + integers.toString());
         }

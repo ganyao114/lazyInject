@@ -35,7 +35,7 @@ public class InjectIPCServiceClient implements LazyInjectIPC {
     }
 
     @Override
-    public Serializable remoteProvide(Class componentType, String providerKey, Serializable[] args) {
+    public Serializable remoteProvide(Class componentType, String providerKey, Object[] args) {
         IBinder binder = checkAndBindService();
         if (binder == null)
             return null;
@@ -59,7 +59,7 @@ public class InjectIPCServiceClient implements LazyInjectIPC {
     }
 
     @Override
-    public Serializable remoteInvoke(Class componentType, String providerKey, Serializable[] args) {
+    public Serializable remoteInvoke(Class componentType, String providerKey, Object[] args) {
         IBinder binder = checkAndBindService();
         if (binder == null)
             return null;

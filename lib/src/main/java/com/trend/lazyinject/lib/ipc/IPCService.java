@@ -36,7 +36,7 @@ public class IPCService extends Service {
             if (componentType == null || providerKey == null)
                 return true;
 
-            Serializable ret = null;
+            Object ret = null;
 
             switch (code) {
                 case LazyInjectIPC.OP_PROVIDE:
@@ -48,7 +48,7 @@ public class IPCService extends Service {
             }
 
             if (flags == 0 && ret != null) {
-                reply.writeSerializable(ret);
+                reply.writeSerializable((Serializable) ret);
             }
 
             return true;
