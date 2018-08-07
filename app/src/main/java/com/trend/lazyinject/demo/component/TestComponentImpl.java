@@ -1,5 +1,8 @@
 package com.trend.lazyinject.demo.component;
 
+import android.os.Bundle;
+import android.util.Log;
+
 import com.trend.lazyinject.annotation.ComponentImpl;
 import com.trend.lazyinject.annotation.DebugLog;
 import com.trend.lazyinject.annotation.InjectComponent;
@@ -58,5 +61,16 @@ public class TestComponentImpl implements TestComponent {
     @Override
     public Map<String, ? extends ArrayList> provide7() {
         return new HashMap<>();
+    }
+
+    @Override
+    public Bundle provide8TestForParcel() {
+        return new Bundle();
+    }
+
+    @Override
+    public Bundle invokeTestForParcel(String a, ModelA modelA, Bundle bundle) {
+        Log.e("ipc invoke - " + a + modelA.toString(), bundle.toString());
+        return new Bundle();
     }
 }

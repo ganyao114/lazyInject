@@ -1,8 +1,8 @@
 package com.trend.lazyinject.demo.component;
 
+import android.os.Bundle;
+
 import com.trend.lazyinject.annotation.Component;
-import com.trend.lazyinject.annotation.Inject;
-import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.annotation.Provide;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.ModelA;
@@ -31,4 +31,7 @@ public interface TestComponent<T extends Serializable & List> extends Serializab
     Map<String, ? extends ModelA> provide6();
     @Provide
     Map<String,T> provide7();
+    @Provide
+    Bundle provide8TestForParcel();
+    Bundle invokeTestForParcel(String a, ModelA modelA, Bundle bundle);
 }
