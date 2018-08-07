@@ -379,7 +379,7 @@ public class TestComponentImpl implements TestComponent {
       android:name="com.trend.lazyinject.lib.ipc.InjectIPCProvider"
       android:process="com.trend.lazyinject.demo.p1" />
 ```
-因为需要 IPC，所以所有 Provider 方法的参数和返回值必须继承自 Serializable, 暂时不支持 Parcelable
+因为需要 IPC，所以所有 Provider 方法的参数和返回值必须继承自 Serializable/Parcelable/IBinder
 # 实现原理  
 [Design Document](https://github.com/ganyao114/lazyInject/blob/master/doc/di_design.md)
 
