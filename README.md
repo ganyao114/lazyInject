@@ -364,7 +364,7 @@ LazyInject.setDebug(true);
 
 ## 实验性功能
 ### 在子进程实现 Component
-依赖 2.0.2-beta 版本可以使用此 Feature
+依赖 2.0.3-beta 版本可以使用此 Feature
 代码在 multi_process 分支
 ```java
 @ComponentImpl(process = "com.trend.lazyinject.demo.p1")
