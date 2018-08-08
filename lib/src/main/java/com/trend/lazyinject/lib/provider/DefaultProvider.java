@@ -61,7 +61,7 @@ public class DefaultProvider implements IProvider {
             LazyInjectIPC ipcClient = InjectIPCClientManager.getClient(componentType);
             if (ipcClient == null)
                 return null;
-            return ipcClient.remoteProvide(componentType, key(), ValueUtils.ObjectToSerial(args));
+            return ipcClient.remoteProvide(componentType, key(), args);
         } else {
             if (args == null) {
                 return providerMethod.invoke(component);
