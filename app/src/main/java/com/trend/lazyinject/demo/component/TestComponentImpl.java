@@ -1,13 +1,17 @@
 package com.trend.lazyinject.demo.component;
 
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.trend.lazyinject.annotation.ComponentImpl;
 import com.trend.lazyinject.annotation.DebugLog;
 import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.demo.model.BaseModel;
+import com.trend.lazyinject.demo.model.BinderCallback;
 import com.trend.lazyinject.demo.model.ModelA;
+import com.trend.lazyinject.demo.model.RemoteCallback;
 import com.trend.lazyinject.lib.LazyInject;
 import com.trend.lazyinject.lib.log.LOG;
 import com.trend.lazyinject.lib.utils.ProcessUtils;
@@ -69,8 +73,27 @@ public class TestComponentImpl implements TestComponent {
     }
 
     @Override
-    public Bundle invokeTestForParcel(String a, ModelA modelA, Bundle bundle) {
+    public Bundle invokeTestForParcel(String a, ModelA modelA, Bundle bundle, IBinder callback) {
         Log.e("ipc invoke - " + a + modelA.toString(), bundle.toString());
+        BinderCallback cb = BinderCallback.Stub.asInterface(callback);
+        new Thread(() -> {
+            int i = 10;
+            while (i > 0) {
+                try {
+                    Thread.currentThread().sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (cb.asBinder().isBinderAlive()) {
+                    try {
+                        cb.callback(i, i == 1);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                i--;
+            }
+        }).start();
         return new Bundle();
     }
 }

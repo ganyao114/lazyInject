@@ -12,6 +12,7 @@ import com.trend.lazyinject.demo.component.TestComponent;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.ModelA;
 import com.trend.lazyinject.demo.model.NullProtectTestA;
+import com.trend.lazyinject.demo.model.RemoteCallback;
 
 import java.util.Collection;
 import java.util.List;
@@ -80,6 +81,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             nullProtectTestA2.test2("....");
         }
         Log.d("test", "BaseModel invoke success = " + testComponent.provide4(null, null));
-        Log.d("test", "Parcel invoke success = " + testComponent.invokeTestForParcel("a", new ModelA("a"), new Bundle()));
+        Log.d("test", "Parcel invoke success = " + testComponent.invokeTestForParcel("a", new ModelA("a"), new Bundle(), new RemoteCallback().asBinder()));
     }
 }
