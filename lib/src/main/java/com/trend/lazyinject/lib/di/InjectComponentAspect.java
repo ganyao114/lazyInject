@@ -38,22 +38,46 @@ public class InjectComponentAspect {
         Object component = field.get(targetObj);
         if (component != null && !injectComponent.alwaysRefresh())
             return joinPoint.proceed();
-        String name = injectComponent.value();
-        if (TextUtils.isEmpty(name)) {
-            component = ComponentManager.getComponent(field.getType());
-        } else {
-            component = ComponentManager.getComponent(name);
-        }
-        if (component != null) {
-            try {
-                field.set(targetObj, component);
-                return component;
-            } catch (IllegalAccessException e) {
-                LOG.LOGE("InjectComponentAspect", "Inject component " + field.getName() + " error!", e);
+        if (injectComponent.alwaysRefresh()) {
+            String name = injectComponent.value();
+            if (TextUtils.isEmpty(name)) {
+                component = ComponentManager.getComponent(field.getType());
+            } else {
+                component = ComponentManager.getComponent(name);
             }
-        } else if (injectComponent.nullProtect()){
-            return InterfaceProxy.make(field.getType());
+            if (component == null && injectComponent.nullProtect()) {
+                component = InterfaceProxy.make(field.getType());
+            }
+            return component;
+        } else {
+            synchronized (getInjectLock(field, targetObj)) {
+                component = field.get(targetObj);
+                if (component != null)
+                    return joinPoint.proceed();
+                String name = injectComponent.value();
+                if (TextUtils.isEmpty(name)) {
+                    component = ComponentManager.getComponent(field.getType());
+                } else {
+                    component = ComponentManager.getComponent(name);
+                }
+                if (component != null) {
+                    try {
+                        field.set(targetObj, component);
+                        return component;
+                    } catch (IllegalAccessException e) {
+                        LOG.LOGE("InjectComponentAspect", "Inject component " + field.getName() + " error!", e);
+                    }
+                }
+                if (component == null && injectComponent.nullProtect()) {
+                    component = InterfaceProxy.make(field.getType());
+                }
+                return component;
+            }
         }
-        return joinPoint.proceed();
     }
+
+    private static Object getInjectLock(Field field, Object target) {
+        return ("LZ_DI_LOCK:" + field.hashCode() + "@" + (target != null ? System.identityHashCode(target) : "")).intern();
+    }
+
 }

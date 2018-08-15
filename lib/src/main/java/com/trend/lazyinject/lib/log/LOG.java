@@ -35,13 +35,13 @@ public class LOG {
     }
 
     public static void LOGE(String tag, String message) {
-        if (TextUtils.isEmpty(message)) {
+        if (!TextUtils.isEmpty(message)) {
             Log.e(tag, message);
         }
     }
 
     public static void LOGE(String tag, String message, Throwable throwable) {
-        if (TextUtils.isEmpty(message)) {
+        if (!TextUtils.isEmpty(message)) {
             Log.e(tag, message, throwable);
         }
     }
