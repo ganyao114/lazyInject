@@ -53,6 +53,7 @@ class ClassGetter {
         if (config.includes == null) {
             container.classes.add(ctClass)
         } else {
+            println("checkCtClass")
             String className = ctClass.name
             for (String include:config.includes) {
                 if (className.contains(include)) {

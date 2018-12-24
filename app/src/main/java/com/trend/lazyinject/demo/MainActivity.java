@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Inject(component = TestComponent.class, args = {"test"}, alwaysRefresh = true)
     BaseModel baseModel;
 
-    @InjectTest
     @Inject(component = TestComponent.class)
     Map<String, ? extends Collection> map;
 
@@ -38,7 +37,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @InjectComponent(nullProtect = true)
     NullProtectTestA nullProtectTestA;
 
-    @InjectTest
     @Inject(nullProtect = true)
     NullProtectTestA nullProtectTestA2;
 
@@ -47,6 +45,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Inject(component = TestComponent.class)
     Bundle bundle;
+
+    @InjectTest
+    ModelA ma = new ModelA();
+
+    BaseModel ba = new BaseModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +88,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             nullProtectTestA2.test1();
             nullProtectTestA2.test2("....");
         }
+
+        try {
+            ba.modelA.toString();
+            ma.toString();
+        } catch (Exception e) {
+
+        }
+
         Log.d("test", "BaseModel invoke success = " + testComponent.provide4(null, null));
         Log.d("test", "Parcel invoke success = " + testComponent.invokeTestForParcel("a", new ModelA("a"), new Bundle(), new RemoteCallback().asBinder()));
     }

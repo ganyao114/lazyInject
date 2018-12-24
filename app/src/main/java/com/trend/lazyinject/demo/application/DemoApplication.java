@@ -2,6 +2,7 @@ package com.trend.lazyinject.demo.application;
 
 import android.app.Application;
 
+import com.trend.lazyinject.annotation.FieldGetHook;
 import com.trend.lazyinject.buildmap.Auto_ComponentBuildMap;
 import com.trend.lazyinject.lib.LazyInject;
 

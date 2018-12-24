@@ -2,6 +2,7 @@ package com.trend.lazyinject.lib;
 
 import android.content.Context;
 
+import com.trend.lazyinject.annotation.FieldGetHook;
 import com.trend.lazyinject.lib.component.ComponentBuilder;
 import com.trend.lazyinject.lib.component.ComponentManager;
 import com.trend.lazyinject.lib.di.DIImpl;
@@ -18,6 +19,12 @@ public class LazyInject {
 
     public static void init(Context context) {
         LazyInject.context = context;
+        FieldGetHook.setHookInject(new FieldGetHook.HookInter() {
+            @Override
+            public Object onFieldGet(Object receiver, Class receiverType, Object currentValue, String fieldName, Class filedType) {
+                return null;
+            }
+        });
     }
 
     public static Context context() {

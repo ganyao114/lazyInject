@@ -1,5 +1,7 @@
 package com.trend.lazyinject.demo.model;
 
+import com.trend.lazyinject.annotation.InjectTest;
+
 import java.io.Serializable;
 
 /**
@@ -7,4 +9,8 @@ import java.io.Serializable;
  */
 
 public class BaseModel implements Serializable {
+
+    @InjectTest
+    public ModelA modelA;
+
 }

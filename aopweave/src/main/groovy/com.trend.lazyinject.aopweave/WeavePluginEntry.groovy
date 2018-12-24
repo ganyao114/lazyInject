@@ -17,6 +17,7 @@ import org.gradle.api.logging.Logger
 
 import java.util.concurrent.ForkJoinPool
 import java.util.function.Consumer
+import com.google.common.collect.ImmutableSet
 
 public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
@@ -45,7 +46,23 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
     @Override
     Set<QualifiedContent.Scope> getScopes() {
-        return TransformManager.SCOPE_FULL_PROJECT
+        def name = QualifiedContent.Scope.PROJECT_LOCAL_DEPS.name()
+        def deprecated = QualifiedContent.Scope.PROJECT_LOCAL_DEPS.getClass()
+                .getField(name).getAnnotation(Deprecated.class)
+
+        if (deprecated == null) {
+            println "cannot find QualifiedContent.Scope.PROJECT_LOCAL_DEPS Deprecated.class "
+            return ImmutableSet.<QualifiedContent.Scope> of(QualifiedContent.Scope.PROJECT
+                    , QualifiedContent.Scope.PROJECT_LOCAL_DEPS
+                    , QualifiedContent.Scope.EXTERNAL_LIBRARIES
+                    , QualifiedContent.Scope.SUB_PROJECTS
+                    , QualifiedContent.Scope.SUB_PROJECTS_LOCAL_DEPS)
+        } else {
+            println "find QualifiedContent.Scope.PROJECT_LOCAL_DEPS"
+            return ImmutableSet.<QualifiedContent.Scope> of(QualifiedContent.Scope.PROJECT
+                    , QualifiedContent.Scope.EXTERNAL_LIBRARIES
+                    , QualifiedContent.Scope.SUB_PROJECTS)
+        }
     }
 
     @Override
@@ -80,12 +97,15 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
         new ForkJoinPool().submit {
             classContainer.classes.parallelStream().findAll { ctClass ->
-                if (ctClass.isInterface())
+                if (ctClass.isInterface()) {
+                    ctClass.writeFile(outputDir.absolutePath)
                     return false
+                }
                 try {
                     ctClass.getSuperclass()
                     return true
                 } catch (Exception e) {
+                    ctClass.writeFile(outputDir.absolutePath)
                     return false
                 }
             }.forEach(new Consumer<CtClass>() {
@@ -99,10 +119,13 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                 if (f.field == null)
                                     return
                                 InjectTest injectTest = f.field.getAnnotation(InjectTest.class)
-                                String methodName = f.field.name
                                 if (injectTest == null)
                                     return
-                                f.replace("\$_ = com.trend.lazyinject.annotation.FieldGetHook.hookInject(\$0, \$class, null, \"${methodName}\", \$type);")
+                                String methodName = f.field.name
+                                String fieldType = f.field.getType().name
+                                if (f.reader) {
+                                    f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInject(\$0, \$class, null, \"${methodName}\", \$type);")
+                                }
                             }
                         })
                     }

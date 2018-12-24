@@ -30,6 +30,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.aspectj:aspectjrt:1.8.+"
     compile project(path: ':annotation')
+    compile 'org.javassist:javassist:3.22.0-GA'
 }
 
 
