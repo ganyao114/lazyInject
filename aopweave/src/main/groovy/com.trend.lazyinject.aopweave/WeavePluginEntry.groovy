@@ -99,10 +99,10 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                 if (f.field == null)
                                     return
                                 InjectTest injectTest = f.field.getAnnotation(InjectTest.class)
-                                String name = f.field.name
+                                String methodName = f.field.name
                                 if (injectTest == null)
                                     return
-                                f.replace("\$_ = com.trend.lazyinject.annotation.FieldGetHook.hookInject(\$0, \$class, null, ${name}, \$type);")
+                                f.replace("\$_ = com.trend.lazyinject.annotation.FieldGetHook.hookInject(\$0, \$class, null, \"${methodName}\", \$type);")
                             }
                         })
                     }
