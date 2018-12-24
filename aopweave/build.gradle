@@ -21,7 +21,7 @@ repositories {
 uploadArchives{
     repositories {
         mavenDeployer {
-            pom.groupId = "com.trand.lazyinject.aopweave"
+            pom.groupId = "com.trand.lazyinject"
             pom.artifactId = "aopweave"
             pom.version = "0.0.1"
             repository(url: uri('../repo'))

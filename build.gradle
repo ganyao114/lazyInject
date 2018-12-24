@@ -16,6 +16,7 @@ buildscript {
         classpath 'com.novoda:bintray-release:0.8.1'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+        classpath 'com.trand.lazyinject:aopweave:0.0.1'
     }
 }
 
@@ -25,6 +26,9 @@ allprojects {
         jcenter()
         maven {
             url "https://dl.bintray.com/ganyao114/maven/"
+        }
+        maven{
+            url uri('./repo')
         }
     }
     tasks.withType(Javadoc) {

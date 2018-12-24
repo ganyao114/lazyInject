@@ -12,7 +12,7 @@ import javassist.WeaveClassPool
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-import java.util.logging.Logger
+import org.gradle.api.logging.Logger
 
 public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
@@ -60,6 +60,8 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
         project.android.bootClasspath.each {
             classPool.appendClassPath((String)it.absolutePath)
         }
+
+        
 
     }
 }
