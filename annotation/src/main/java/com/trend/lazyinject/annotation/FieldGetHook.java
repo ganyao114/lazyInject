@@ -13,23 +13,23 @@ public class FieldGetHook {
         FieldGetHook.hookInjectComponent = hookInjectComponent;
     }
 
-    public static Object hookInject(Object receiver, Class receiverType, Object currentValue, String fieldName, Class filedType) {
+    public static Object hookInject(boolean isStatic, Object receiver, Class receiverType, String fieldName, Class filedType, InjectInfo injectInfo) {
         if (hookInject != null) {
-            return hookInject.onFieldGet(receiver, receiverType, currentValue, fieldName, filedType);
+            return hookInject.onFieldGet(isStatic, receiver, receiverType, fieldName, filedType, injectInfo);
         } else {
             return null;
         }
     }
 
-    public static Object hookInjectComponent(Object receiver, Class receiverType, Object currentValue, String fieldName, Class filedType) {
+    public static Object hookInjectComponent(boolean isStatic, Object receiver, Class receiverType, String fieldName, Class filedType, InjectInfo injectInfo) {
         if (hookInjectComponent != null) {
-            return hookInjectComponent.onFieldGet(receiver, receiverType, currentValue, fieldName, filedType);
+            return hookInjectComponent.onFieldGet(isStatic, receiver, receiverType, fieldName, filedType, injectInfo);
         } else {
             return null;
         }
     }
 
     public interface HookInter {
-        Object onFieldGet(Object receiver, Class receiverType, Object currentValue, String fieldName, Class filedType);
+        Object onFieldGet(boolean isStatic, Object receiver, Class receiverType, String fieldName, Class filedType, InjectInfo injectInfo);
     }
 }

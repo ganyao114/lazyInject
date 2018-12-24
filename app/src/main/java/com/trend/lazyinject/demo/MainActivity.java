@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Inject(component = TestComponent.class)
     Bundle bundle;
 
-    @InjectTest
     ModelA ma = new ModelA();
 
     BaseModel ba = new BaseModel();
@@ -91,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         try {
             ba.modelA.toString();
-            ma.toString();
         } catch (Exception e) {
 
         }

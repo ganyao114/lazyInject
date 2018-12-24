@@ -3,17 +3,21 @@ package com.trend.lazyinject.aopweave
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.trend.lazyinject.annotation.InjectTest
+import com.trend.lazyinject.aopweave.annotation.AnnotationParser
 import com.trend.lazyinject.aopweave.classes.ClassContainer
 import com.trend.lazyinject.aopweave.classes.ClassGetter
 import com.trend.lazyinject.aopweave.config.WeaveConfig
 import javassist.CannotCompileException
 import javassist.CtClass
+import javassist.Modifier
 import javassist.WeaveClassPool
+import javassist.bytecode.AnnotationsAttribute
 import javassist.expr.ExprEditor
 import javassist.expr.FieldAccess
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
+import javassist.bytecode.annotation.Annotation
 
 import java.util.concurrent.ForkJoinPool
 import java.util.function.Consumer
@@ -98,14 +102,12 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
         new ForkJoinPool().submit {
             classContainer.classes.parallelStream().findAll { ctClass ->
                 if (ctClass.isInterface()) {
-                    ctClass.writeFile(outputDir.absolutePath)
                     return false
                 }
                 try {
                     ctClass.getSuperclass()
                     return true
                 } catch (Exception e) {
-                    ctClass.writeFile(outputDir.absolutePath)
                     return false
                 }
             }.forEach(new Consumer<CtClass>() {
@@ -121,17 +123,25 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                 InjectTest injectTest = f.field.getAnnotation(InjectTest.class)
                                 if (injectTest == null)
                                     return
-                                String methodName = f.field.name
-                                String fieldType = f.field.getType().name
                                 if (f.reader) {
-                                    f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInject(\$0, \$class, null, \"${methodName}\", \$type);")
+                                    String methodName = f.field.name
+                                    String fieldType = f.field.getType().name
+                                    String isStatic = Modifier.isStatic(f.field.getModifiers()) ? "true" : "false"
+                                    String injectInfo = AnnotationParser.getInjectInfo(f.field.getFieldInfo())
+                                    f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInject(${isStatic}, \$0, \$class, \"${methodName}\", \$type, ${injectInfo});")
                                 }
                             }
                         })
                     }
-                    ctClass.writeFile(outputDir.absolutePath)
                 }
             })
         }.get()
+
+        new ForkJoinPool().submit {
+            classContainer.classes.parallelStream().findAll { ctClass ->
+                ctClass.writeFile(outputDir.absolutePath)
+            }
+        }.get()
+
     }
 }
