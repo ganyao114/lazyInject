@@ -10,9 +10,13 @@ dependencies {
     compile 'com.android.tools.build:gradle:3.0.1'
     compile 'org.javassist:javassist:3.22.0-GA'
     compile 'org.ow2.asm:asm-debug-all:5.2'
+    compile 'com.trend.lazyinject:annotation:0.0.1-local'
 }
 
 repositories {
+    maven{
+        url uri('../repo')
+    }
     mavenLocal()
     mavenCentral()
     jcenter()
@@ -21,7 +25,7 @@ repositories {
 uploadArchives{
     repositories {
         mavenDeployer {
-            pom.groupId = "com.trand.lazyinject"
+            pom.groupId = "com.trend.lazyinject"
             pom.artifactId = "aopweave"
             pom.version = "0.0.1"
             repository(url: uri('../repo'))

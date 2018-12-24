@@ -8,6 +8,7 @@ import android.widget.Button;
 
 import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.InjectComponent;
+import com.trend.lazyinject.annotation.InjectTest;
 import com.trend.lazyinject.demo.component.TestComponent;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.ModelA;
@@ -28,12 +29,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<String> strings;
     @Inject(component = TestComponent.class, args = {"test"}, alwaysRefresh = true)
     BaseModel baseModel;
+
+    @InjectTest
     @Inject(component = TestComponent.class)
     Map<String, ? extends Collection> map;
 
     //NullProtect
     @InjectComponent(nullProtect = true)
     NullProtectTestA nullProtectTestA;
+
+    @InjectTest
     @Inject(nullProtect = true)
     NullProtectTestA nullProtectTestA2;
 

@@ -10,6 +10,7 @@ import java.io.Serializable;
  */
 
 public interface LoginMVP {
+
     interface View {
         void loginSuccess();
         void loginError();

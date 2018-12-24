@@ -1,4 +1,5 @@
 apply plugin: 'java'
+apply plugin: 'maven'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -21,4 +22,15 @@ publish {
     desc = rootProject.desc
     website = rootProject.website
     licences = rootProject.licences
+}
+
+uploadArchives{
+    repositories {
+        mavenDeployer {
+            pom.groupId = "com.trend.lazyinject"
+            pom.artifactId = "annotation"
+            pom.version = "0.0.1-local"
+            repository(url: uri('../repo'))
+        }
+    }
 }
