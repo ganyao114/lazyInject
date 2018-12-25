@@ -18,7 +18,7 @@ import java.lang.reflect.Field;
 /**
  * Created by ganyao on 2017/12/5.
  */
-@Aspect
+//@Aspect
 public class InjectComponentAspect {
 
     @Pointcut("get(* *) && @annotation(injectComponent)")

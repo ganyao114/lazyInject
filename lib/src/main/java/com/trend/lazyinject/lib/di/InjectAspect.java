@@ -16,7 +16,7 @@ import java.lang.reflect.Field;
 /**
  * Created by swift_gan on 2017/12/7.
  */
-@Aspect
+//@Aspect
 public class InjectAspect {
 
 

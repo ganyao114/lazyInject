@@ -45,11 +45,11 @@
     @com.trend.lazyinject.annotation.Provide <methods>;
 }
 
--keep class ** {
+-keepclassmembers class ** {
      @com.trend.lazyinject.annotation.Inject <fields>;
 }
 
--keep class ** {
+-keepclassmembers class ** {
      @com.trend.lazyinject.annotation.InjectComponent <fields>;
 }
 
