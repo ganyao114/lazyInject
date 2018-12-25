@@ -51,10 +51,9 @@ class ClassGetter {
 
     static void checkCtClass(ClassPool classPool, ClassContainer container, CtClass ctClass, WeaveConfig config) {
         boolean needAdd = false
-        if (config.includes == null) {
+        if (config.includes == null || config.includes.length == 0) {
             needAdd = true
         } else {
-            println("checkCtClass")
             String className = ctClass.name
             for (String include:config.includes) {
                 if (className.contains(include)) {
