@@ -39,6 +39,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Inject(nullProtect = true)
     NullProtectTestA nullProtectTestA2;
 
+    @InjectComponent(nullProtect = true)
+    NullProtectTestA nullProtectTestA3;
+
     Button btnInject;
 
 
@@ -101,6 +104,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        nullProtectTestA3.test1();
 
         Log.d("test", "BaseModel invoke success = " + testComponent.provide4(null, null));
         Log.d("test", "Parcel invoke success = " + testComponent.invokeTestForParcel("a", new ModelA("a"), new Bundle(), new RemoteCallback().asBinder()));

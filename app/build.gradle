@@ -26,10 +26,11 @@ android {
 //
 //aspectjx {
 //    include 'trend'
+
 //}
 
 lazyinject {
-    enable false
+    enable true
 }
 
 dependencies {
