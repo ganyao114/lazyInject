@@ -3,7 +3,8 @@ package com.trend.lazyinject.aopweave
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.collect.ImmutableSet
-import com.trend.lazyinject.annotation.InjectTest
+import com.trend.lazyinject.annotation.Inject
+import com.trend.lazyinject.annotation.InjectComponent
 import com.trend.lazyinject.aopweave.annotation.AnnotationParser
 import com.trend.lazyinject.aopweave.classes.ClassContainer
 import com.trend.lazyinject.aopweave.classes.ClassGetter
@@ -30,10 +31,21 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
     @Override
     void apply(Project project) {
         this.project = project
-        project.android.registerTransform(this)
+
         project.extensions.create("lazyinject",WeaveConfig)
         logger = project.logger
         config = project.lazyinject
+
+        project.android.registerTransform(this)
+
+//        if (project.hasProperty("lazyinject")) {
+//            def c = project.getProperties().get("lazyinject")
+//            if (c.getProperties().get("enable", true)) {
+//                project.android.registerTransform(this)
+//            }
+//        } else {
+//            project.android.registerTransform(this)
+//        }
     }
 
     @Override
@@ -69,12 +81,16 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
     @Override
     boolean isIncremental() {
-        return false
+        return true
     }
 
     @Override
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
+
+        if (!config.enable)
+            return
+
         Context context = transformInvocation.context
         Collection<TransformInput> inputs = transformInvocation.inputs
         Collection<TransformInput> referencedInputs = transformInvocation.referencedInputs
@@ -118,17 +134,28 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                 super.edit(f)
                                 if (f.field == null)
                                     return
-                                InjectTest injectTest = f.field.getAnnotation(InjectTest.class)
-                                if (injectTest == null)
-                                    return
-                                if (f.reader) {
-                                    String fieldName = f.field.name
-                                    String fieldType = f.field.getType().name
-                                    String fieldDeclareClass = f.field.declaringClass.name
-                                    String isStatic = Modifier.isStatic(f.field.getModifiers()) ? "true" : "false"
-                                    String injectInfo = AnnotationParser.getInjectInfo(f.field.getFieldInfo())
-                                    //fieldName = fieldDeclareClass + ".class.getDeclaredField(\"${fieldName}\").getName()"
-                                    f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInject(${isStatic}, \$0, ${fieldDeclareClass}.class,\"${fieldName}\", ${fieldType}.class, ${injectInfo});")
+                                Inject inject = f.field.getAnnotation(Inject.class)
+                                InjectComponent injectComponent = f.field.getAnnotation(InjectComponent.class)
+                                if (inject != null) {
+                                    if (f.reader) {
+                                        String fieldName = f.field.name
+                                        String fieldType = f.field.getType().name
+                                        String fieldDeclareClass = f.field.declaringClass.name
+                                        String isStatic = Modifier.isStatic(f.field.getModifiers()) ? "true" : "false"
+                                        String injectInfo = AnnotationParser.getInjectInfo(f.field.getFieldInfo())
+                                        String fieldGet = fieldDeclareClass + ".class.getDeclaredField(\"${fieldName}\")"
+                                        f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInject(${isStatic}, \$0, ${fieldDeclareClass}.class,${fieldGet}, ${fieldType}.class, ${injectInfo});")
+                                    }
+                                } else if (injectComponent != null) {
+                                    if (f.reader) {
+                                        String fieldName = f.field.name
+                                        String fieldType = f.field.getType().name
+                                        String fieldDeclareClass = f.field.declaringClass.name
+                                        String isStatic = Modifier.isStatic(f.field.getModifiers()) ? "true" : "false"
+                                        String injectInfo = AnnotationParser.getInjectComponentInfo(f.field.getFieldInfo())
+                                        String fieldGet = fieldDeclareClass + ".class.getDeclaredField(\"${fieldName}\")"
+                                        f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInjectComponent(${isStatic}, \$0, ${fieldDeclareClass}.class,${fieldGet}, ${fieldType}.class, ${injectInfo});")
+                                    }
                                 }
                             }
                         })
@@ -139,6 +166,12 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
         new ForkJoinPool().submit {
             classContainer.classes.parallelStream().findAll { ctClass ->
+                ctClass.writeFile(outputDir.absolutePath)
+            }
+        }.get()
+
+        new ForkJoinPool().submit {
+            classContainer.classesNotScan.parallelStream().findAll { ctClass ->
                 ctClass.writeFile(outputDir.absolutePath)
             }
         }.get()

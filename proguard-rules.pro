@@ -17,6 +17,7 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
+
 -keepattributes *Annotation*
 #保留部分泛型信息，必要!
 -keepattributes Signature
@@ -40,8 +41,16 @@
 *;
 }
 
--keepclassmembers class * {
-    @com.trend.lazyinject.annotation.Component *;
+-keepclassmembers class ** {
+    @com.trend.lazyinject.annotation.Provide <methods>;
+}
+
+-keep class ** {
+     @com.trend.lazyinject.annotation.Inject <fields>;
+}
+
+-keep class ** {
+     @com.trend.lazyinject.annotation.InjectComponent <fields>;
 }
 
 -dontwarn javassist.**

@@ -1,5 +1,5 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-aspectjx'
+//apply plugin: 'android-aspectjx'
 apply plugin: 'lazyinject-weave'
 android {
     compileSdkVersion 26
@@ -23,9 +23,13 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
+//
+//aspectjx {
+//    include 'trend'
+//}
 
-aspectjx {
-    include 'trend'
+lazyinject {
+    enable false
 }
 
 dependencies {

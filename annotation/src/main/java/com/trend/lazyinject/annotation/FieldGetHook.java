@@ -1,35 +1,27 @@
 package com.trend.lazyinject.annotation;
 
+import java.lang.reflect.Field;
+
 public class FieldGetHook {
 
     private static volatile HookInter hookInject;
-    private static volatile HookInter hookInjectComponent;
 
     public static void setHookInject(HookInter hookInject) {
         FieldGetHook.hookInject = hookInject;
     }
 
-    public static void setHookInjectComponent(HookInter hookInjectComponent) {
-        FieldGetHook.hookInjectComponent = hookInjectComponent;
+    public final static Object hookInject(boolean isStatic, Object receiver, Class receiverType, Field field, Class filedType, Inject inject) {
+        return hookInject.onInject(isStatic, receiver, receiverType, field, filedType, inject);
     }
 
-    public static Object hookInject(boolean isStatic, Object receiver, Class receiverType, String fieldName, Class filedType, InjectInfo injectInfo) {
-        if (hookInject != null) {
-            return hookInject.onFieldGet(isStatic, receiver, receiverType, fieldName, filedType, injectInfo);
-        } else {
-            return null;
-        }
-    }
-
-    public static Object hookInjectComponent(boolean isStatic, Object receiver, Class receiverType, String fieldName, Class filedType, InjectInfo injectInfo) {
-        if (hookInjectComponent != null) {
-            return hookInjectComponent.onFieldGet(isStatic, receiver, receiverType, fieldName, filedType, injectInfo);
-        } else {
-            return null;
-        }
+    public final static Object hookInjectComponent(boolean isStatic, Object receiver, Class receiverType, Field field, Class filedType, InjectComponent injectComponent) {
+        return hookInject.onInjectComponent(isStatic, receiver, receiverType, field, filedType, injectComponent);
     }
 
     public interface HookInter {
-        Object onFieldGet(boolean isStatic, Object receiver, Class receiverType, String fieldName, Class filedType, InjectInfo injectInfo);
+        Object onInject(boolean isStatic, Object receiver, Class receiverType, Field field, Class filedType, Inject injectInfo);
+        Object onInjectComponent(boolean isStatic, Object receiver, Class receiverType, Field field, Class filedType, InjectComponent injectInfo);
     }
+
+
 }

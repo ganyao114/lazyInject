@@ -1,8 +1,9 @@
 package com.trend.lazyinject.annotation;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 
-public class InjectInfo {
+public class InjectInfo implements Inject {
 
     public Class component;
     public boolean alwaysRefresh;
@@ -24,5 +25,30 @@ public class InjectInfo {
                 ", nullProtect=" + nullProtect +
                 ", args=" + Arrays.toString(args) +
                 '}';
+    }
+
+    @Override
+    public Class<? extends Annotation> annotationType() {
+        return Inject.class;
+    }
+
+    @Override
+    public Class<?> component() {
+        return component;
+    }
+
+    @Override
+    public boolean alwaysRefresh() {
+        return alwaysRefresh;
+    }
+
+    @Override
+    public String[] args() {
+        return args;
+    }
+
+    @Override
+    public boolean nullProtect() {
+        return nullProtect;
     }
 }

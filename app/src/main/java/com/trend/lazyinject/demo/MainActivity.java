@@ -8,7 +8,6 @@ import android.widget.Button;
 
 import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.InjectComponent;
-import com.trend.lazyinject.annotation.InjectTest;
 import com.trend.lazyinject.demo.component.TestComponent;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.ModelA;
@@ -98,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         try {
-            ba.modelA.toString();
+            ma.toString();
         } catch (Exception e) {
             e.printStackTrace();
         }
