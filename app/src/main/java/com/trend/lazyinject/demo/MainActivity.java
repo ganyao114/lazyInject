@@ -60,6 +60,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+
+
+        try {
+            ba.modelA.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         if (integers != null) {
             Log.d("test", "List<Integer> inject success = " + integers.toString());
         }
@@ -91,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             ba.modelA.toString();
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
 
         Log.d("test", "BaseModel invoke success = " + testComponent.provide4(null, null));

@@ -15,10 +15,15 @@ public class AnnotationParser {
         Annotation annotation = attribute.getAnnotation(InjectTest.class.getName())
         ClassMemberValue componentValue = annotation.getMemberValue("component")
         BooleanMemberValue refreshValue = annotation.getMemberValue("alwaysRefresh")
-        BooleanMemberValue nullProtect = annotation.getMemberValue("nullProtect")
+        BooleanMemberValue nullProtectValue = annotation.getMemberValue("nullProtect")
         ArrayMemberValue argsValue = annotation.getMemberValue("args")
 
-        return "new com.trend.lazyinject.annotation.InjectInfo(${componentValue.toString()}, ${refreshValue.toString()}, ${nullProtect.toString()}, new String[]${argsValue.toString()})"
+        String component = componentValue == null ? InjectTest.None.getCanonicalName() + ".class" : componentValue.toString()
+        String refreshed = refreshValue == null ? "false" : refreshValue.toString()
+        String nullProtect = nullProtectValue == null ? "false" : nullProtectValue.toString()
+        String args = argsValue == null ? "null" : "new String[]" + argsValue.toString()
+
+        return "new com.trend.lazyinject.annotation.InjectInfo(${component}, ${refreshed}, ${nullProtect}, ${args})"
 
     }
 }

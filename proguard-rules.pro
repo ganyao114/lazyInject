@@ -43,3 +43,12 @@
 -keepclassmembers class * {
     @com.trend.lazyinject.annotation.Component *;
 }
+
+-keep class javassist.**{*;}
+-keep class com.sun.**{*;}
+-keep class java.lang.**{*;}
+-keep class java.applet.**{*;}
+-dontwarn javassist.**
+
+-keep class com.trend.lazyinject.lib.LazyInject {*;}
+

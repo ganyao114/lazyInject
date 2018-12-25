@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 public class BaseModel implements Serializable {
 
-    @InjectTest(component = TestComponent.class, alwaysRefresh = true, nullProtect = true, args = {"a", "b"})
+    @InjectTest
     public ModelA modelA;
 
 }

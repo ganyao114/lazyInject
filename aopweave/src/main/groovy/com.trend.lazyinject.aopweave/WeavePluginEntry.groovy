@@ -2,6 +2,7 @@ package com.trend.lazyinject.aopweave
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
+import com.google.common.collect.ImmutableSet
 import com.trend.lazyinject.annotation.InjectTest
 import com.trend.lazyinject.aopweave.annotation.AnnotationParser
 import com.trend.lazyinject.aopweave.classes.ClassContainer
@@ -11,17 +12,14 @@ import javassist.CannotCompileException
 import javassist.CtClass
 import javassist.Modifier
 import javassist.WeaveClassPool
-import javassist.bytecode.AnnotationsAttribute
 import javassist.expr.ExprEditor
 import javassist.expr.FieldAccess
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
-import javassist.bytecode.annotation.Annotation
 
 import java.util.concurrent.ForkJoinPool
 import java.util.function.Consumer
-import com.google.common.collect.ImmutableSet
 
 public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
@@ -126,9 +124,10 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                 if (f.reader) {
                                     String methodName = f.field.name
                                     String fieldType = f.field.getType().name
+                                    String fieldDeclareClass = f.field.declaringClass.name
                                     String isStatic = Modifier.isStatic(f.field.getModifiers()) ? "true" : "false"
                                     String injectInfo = AnnotationParser.getInjectInfo(f.field.getFieldInfo())
-                                    f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInject(${isStatic}, \$0, \$class, \"${methodName}\", \$type, ${injectInfo});")
+                                    f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInject(${isStatic}, \$0, ${fieldDeclareClass}.class, \"${methodName}\", ${fieldType}.class, ${injectInfo});")
                                 }
                             }
                         })

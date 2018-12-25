@@ -1,6 +1,7 @@
 package com.trend.lazyinject.lib;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.trend.lazyinject.annotation.FieldGetHook;
 import com.trend.lazyinject.annotation.InjectInfo;
@@ -13,7 +14,6 @@ import com.trend.lazyinject.lib.log.MethodMonitor;
 /**
  * Created by ganyao on 2018/4/16.
  */
-
 public class LazyInject {
 
     static Context context;
@@ -23,6 +23,8 @@ public class LazyInject {
         FieldGetHook.setHookInject(new FieldGetHook.HookInter() {
             @Override
             public Object onFieldGet(boolean isStatic, Object receiver, Class receiverType, String fieldName, Class filedType, InjectInfo injectInfo) {
+                Log.e("LazyInject", "isStatic:" + isStatic + " - receiver:" + receiver + " - receiverType:" + receiverType + " - fieldName:"+ fieldName + " - injectInfo:" + injectInfo);
+
                 return null;
             }
         });
