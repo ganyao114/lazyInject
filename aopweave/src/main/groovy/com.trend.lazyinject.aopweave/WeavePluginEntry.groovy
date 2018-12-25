@@ -122,12 +122,13 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                 if (injectTest == null)
                                     return
                                 if (f.reader) {
-                                    String methodName = f.field.name
+                                    String fieldName = f.field.name
                                     String fieldType = f.field.getType().name
                                     String fieldDeclareClass = f.field.declaringClass.name
                                     String isStatic = Modifier.isStatic(f.field.getModifiers()) ? "true" : "false"
                                     String injectInfo = AnnotationParser.getInjectInfo(f.field.getFieldInfo())
-                                    f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInject(${isStatic}, \$0, ${fieldDeclareClass}.class, \"${methodName}\", ${fieldType}.class, ${injectInfo});")
+                                    //fieldName = fieldDeclareClass + ".class.getDeclaredField(\"${fieldName}\").getName()"
+                                    f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInject(${isStatic}, \$0, ${fieldDeclareClass}.class,\"${fieldName}\", ${fieldType}.class, ${injectInfo});")
                                 }
                             }
                         })
