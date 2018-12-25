@@ -12,6 +12,7 @@ import com.trend.lazyinject.aopweave.config.WeaveConfig
 import javassist.CannotCompileException
 import javassist.CtClass
 import javassist.Modifier
+import javassist.NotFoundException
 import javassist.WeaveClassPool
 import javassist.expr.ExprEditor
 import javassist.expr.FieldAccess
@@ -121,7 +122,12 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                             it.instrument(new ExprEditor() {
                                 @Override
                                 void edit(FieldAccess f) throws CannotCompileException {
-                                    super.edit(f)
+                                    try {
+                                        if (f.field == null)
+                                            return
+                                    } catch (NotFoundException e) {
+                                        return
+                                    }
                                     if (f.field == null)
                                         return
                                     Inject inject = f.field.getAnnotation(Inject.class)

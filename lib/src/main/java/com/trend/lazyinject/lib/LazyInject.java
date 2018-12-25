@@ -29,7 +29,7 @@ public class LazyInject {
         FieldGetHook.setHookInject(new FieldGetHook.HookInter() {
             @Override
             public Object onInject(boolean isStatic, Object receiver, Class receiverType, Field field, Class filedType, Inject inject) {
-                Log.e("LazyInject", "isStatic:" + isStatic + " - receiver:" + receiver + " - receiverType:" + receiverType + " - field:"+ field.getName() + " - injectInfo:" + inject);
+                //Log.e("LazyInject", "isStatic:" + isStatic + " - receiver:" + receiver + " - receiverType:" + receiverType + " - field:"+ field.getName() + " - injectInfo:" + inject);
                 try {
                     return InjectWeave.inject(isStatic, receiver, field, receiverType, filedType, inject);
                 } catch (Throwable throwable) {
@@ -40,7 +40,7 @@ public class LazyInject {
 
             @Override
             public Object onInjectComponent(boolean isStatic, Object receiver, Class receiverType, Field field, Class filedType, InjectComponent injectComponent) {
-                Log.e("LazyInject", "isStatic:" + isStatic + " - receiver:" + receiver + " - receiverType:" + receiverType + " - field:"+ field.getName() + " - injectInfo:" + injectComponent);
+                //Log.e("LazyInject", "isStatic:" + isStatic + " - receiver:" + receiver + " - receiverType:" + receiverType + " - field:"+ field.getName() + " - injectInfo:" + injectComponent);
                 try {
                     return InjectComponentWeave.inject(isStatic, receiver, field, receiverType, filedType, injectComponent);
                 } catch (Throwable throwable) {

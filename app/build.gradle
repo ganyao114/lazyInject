@@ -29,9 +29,9 @@ android {
 
 //}
 
-lazyinject {
-    enable true
-}
+//lazyinject {
+//    enable true
+//}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -44,4 +44,5 @@ dependencies {
 //    annotationProcessor 'com.trend.lazyinject:compiler:0.0.3-beta'
     compile project(path: ':lib')
     annotationProcessor project(path: ':compiler')
+    compile 'com.wei.android.lib:fingerprintidentify:1.2.1'
 }

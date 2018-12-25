@@ -17,7 +17,7 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
-
+-ignorewarning
 -keepattributes *Annotation*
 #保留部分泛型信息，必要!
 -keepattributes Signature
@@ -54,3 +54,10 @@
 }
 
 -dontwarn javassist.**
+
+#FingerprintUtils
+# MeiZuFingerprint
+-keep class com.fingerprints.service.** { *; }
+
+# SmsungFingerprint
+-keep class com.samsung.android.sdk.** { *; }
