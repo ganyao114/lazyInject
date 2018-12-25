@@ -69,9 +69,19 @@ dependencies {
 *;
 }
 
--keepclassmembers class * {
-    @com.trend.lazyinject.annotation.Component *;
+-keepclassmembers class ** {
+    @com.trend.lazyinject.annotation.Provide <methods>;
 }
+
+-keep class ** {
+     @com.trend.lazyinject.annotation.Inject <fields>;
+}
+
+-keep class ** {
+     @com.trend.lazyinject.annotation.InjectComponent <fields>;
+}
+
+-dontwarn javassist.**
 ```  
 # 3.Example  
 ## Component  
