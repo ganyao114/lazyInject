@@ -1,5 +1,6 @@
 package com.trend.lazyinject.demo;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.Button;
 import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.demo.component.TestComponent;
+import com.trend.lazyinject.demo.component.TestComponentB;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.ModelA;
 import com.trend.lazyinject.demo.model.NullProtectTestA;
@@ -52,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     BaseModel ba = new BaseModel();
 
+    @Inject(component = TestComponentB.class)
+    Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,6 +94,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         if (bundle != null) {
             Log.d("test", "Bundle inject success = " + bundle.toString());
+        }
+
+        if (context != null) {
+            Log.d("test", "Context inject success = " + context.toString());
         }
         if (nullProtectTestA != null) {
             nullProtectTestA.test1();

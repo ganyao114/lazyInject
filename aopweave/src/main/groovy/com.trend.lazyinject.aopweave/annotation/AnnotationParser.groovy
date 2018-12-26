@@ -2,16 +2,16 @@ package com.trend.lazyinject.aopweave.annotation
 
 import com.trend.lazyinject.annotation.Inject
 import com.trend.lazyinject.annotation.InjectComponent
+import com.trend.lazyinject.aopweave.infos.InjectAnnoInfo
+import javassist.ClassPool
+import javassist.CtClass
+import javassist.CtField
 import javassist.bytecode.AnnotationsAttribute
 import javassist.bytecode.FieldInfo
-import javassist.bytecode.annotation.Annotation
-import javassist.bytecode.annotation.ArrayMemberValue
-import javassist.bytecode.annotation.BooleanMemberValue
-import javassist.bytecode.annotation.ClassMemberValue
-import javassist.bytecode.annotation.StringMemberValue
+import javassist.bytecode.annotation.*
 
 public class AnnotationParser {
-    public static String getInjectInfo(FieldInfo fieldInfo) {
+    public static String getInjectInfoStr(FieldInfo fieldInfo) {
 
         AnnotationsAttribute attribute = (AnnotationsAttribute) fieldInfo.getAttribute(AnnotationsAttribute.visibleTag)
         Annotation annotation = attribute.getAnnotation(Inject.class.getName())
@@ -29,7 +29,7 @@ public class AnnotationParser {
 
     }
 
-    public static String getInjectComponentInfo(FieldInfo fieldInfo) {
+    public static String getInjectComponentInfoStr(FieldInfo fieldInfo) {
 
         AnnotationsAttribute attribute = (AnnotationsAttribute) fieldInfo.getAttribute(AnnotationsAttribute.visibleTag)
         Annotation annotation = attribute.getAnnotation(InjectComponent.class.getName())
@@ -44,4 +44,33 @@ public class AnnotationParser {
         return "new com.trend.lazyinject.annotation.InjectComponentInfo(${value}, ${refreshed}, ${nullProtect})"
 
     }
+
+    public static InjectAnnoInfo getInjectInfo(CtField field, ClassPool classPool) {
+
+        AnnotationsAttribute attribute = (AnnotationsAttribute) field.fieldInfo.getAttribute(AnnotationsAttribute.visibleTag)
+        Annotation annotation = attribute.getAnnotation(Inject.class.getName())
+        ClassMemberValue componentValue = annotation.getMemberValue("component")
+        BooleanMemberValue refreshValue = annotation.getMemberValue("alwaysRefresh")
+        BooleanMemberValue nullProtectValue = annotation.getMemberValue("nullProtect")
+        ArrayMemberValue argsValue = annotation.getMemberValue("args")
+
+        String component = componentValue == null ? Inject.None.name : componentValue.getValue()
+
+        InjectAnnoInfo info = new InjectAnnoInfo()
+
+        if (Inject.None.name.equals(component)) {
+            info.component = field.type.declaringClass
+            if (info.component == null)
+                return null
+        } else {
+            info.component = classPool.get(component)
+        }
+
+        info.alwaysRefresh = refreshValue == null ? false : refreshValue.value
+        info.nullProtect = nullProtectValue == null ? false : nullProtectValue.value
+        info.args = argsValue == null ? "null" : "new String[]" + argsValue.toString()
+
+        return info
+    }
+
 }

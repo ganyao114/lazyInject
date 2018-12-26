@@ -1,5 +1,7 @@
 package com.trend.lazyinject.demo.component;
 
+import android.app.Application;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.IBinder;
 
@@ -36,4 +38,6 @@ public interface TestComponent<T extends Serializable & List> extends Serializab
     @Provide
     Bundle provide8TestForParcel();
     Bundle invokeTestForParcel(String a, ModelA modelA, Bundle bundle, IBinder callback);
+    @Provide
+    Application c();
 }

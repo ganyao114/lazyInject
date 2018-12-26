@@ -9,7 +9,11 @@ import com.trend.lazyinject.aopweave.annotation.AnnotationParser
 import com.trend.lazyinject.aopweave.classes.ClassContainer
 import com.trend.lazyinject.aopweave.classes.ClassGetter
 import com.trend.lazyinject.aopweave.config.WeaveConfig
+import com.trend.lazyinject.aopweave.optimize.InlingOptimize
+import com.trend.lazyinject.aopweave.weave.InjectComponentWeave
+import com.trend.lazyinject.aopweave.weave.InjectWeave
 import javassist.CannotCompileException
+import javassist.ClassPool
 import javassist.CtClass
 import javassist.Modifier
 import javassist.NotFoundException
@@ -94,15 +98,17 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
         ClassContainer classContainer = ClassGetter.toCtClasses(inputs, classPool, config)
 
-        doWeave(classContainer, outputProvider.getContentLocation("main", outputTypes, scopes, Format.DIRECTORY))
+        doWeave(classContainer, outputProvider.getContentLocation("main", outputTypes, scopes, Format.DIRECTORY), classPool)
 
 
 
     }
 
-    void doWeave(ClassContainer classContainer, File outputDir) {
+    void doWeave(ClassContainer classContainer, File outputDir, ClassPool classPool) {
 
         if (config.enable) {
+
+            InlingOptimize inlingOptimize = new InlingOptimize(classPool)
 
             new ForkJoinPool().submit {
                 classContainer.classes.parallelStream().findAll { ctClass ->
@@ -134,24 +140,16 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                     InjectComponent injectComponent = f.field.getAnnotation(InjectComponent.class)
                                     if (inject != null) {
                                         if (f.reader) {
-                                            String fieldName = f.field.name
-                                            String fieldType = f.field.getType().name
-                                            String fieldDeclareClass = f.field.declaringClass.name
-                                            String isStatic = Modifier.isStatic(f.field.getModifiers()) ? "true" : "false"
-                                            String injectInfo = AnnotationParser.getInjectInfo(f.field.getFieldInfo())
-                                            String fieldGet = fieldDeclareClass + ".class.getDeclaredField(\"${fieldName}\")"
-                                            f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInject(${isStatic}, \$0, ${fieldDeclareClass}.class,${fieldGet}, ${fieldType}.class, ${injectInfo});")
+                                            if (config.optimize) {
+                                                if (!inlingOptimize.optimize(f, false)) {
+                                                    InjectWeave.inject(f)
+                                                }
+                                            } else {
+                                                InjectWeave.inject(f)
+                                            }
                                         }
                                     } else if (injectComponent != null) {
-                                        if (f.reader) {
-                                            String fieldName = f.field.name
-                                            String fieldType = f.field.getType().name
-                                            String fieldDeclareClass = f.field.declaringClass.name
-                                            String isStatic = Modifier.isStatic(f.field.getModifiers()) ? "true" : "false"
-                                            String injectInfo = AnnotationParser.getInjectComponentInfo(f.field.getFieldInfo())
-                                            String fieldGet = fieldDeclareClass + ".class.getDeclaredField(\"${fieldName}\")"
-                                            f.replace("\$_ = (${fieldType})com.trend.lazyinject.annotation.FieldGetHook.hookInjectComponent(${isStatic}, \$0, ${fieldDeclareClass}.class,${fieldGet}, ${fieldType}.class, ${injectInfo});")
-                                        }
+                                        InjectComponentWeave.inject(f)
                                     }
                                 }
                             })

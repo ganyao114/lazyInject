@@ -1,5 +1,6 @@
 package com.trend.lazyinject.demo.component;
 
+import android.app.Application;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -8,6 +9,7 @@ import android.util.Log;
 import com.trend.lazyinject.annotation.ComponentImpl;
 import com.trend.lazyinject.annotation.DebugLog;
 import com.trend.lazyinject.annotation.InjectComponent;
+import com.trend.lazyinject.demo.application.DemoApplication;
 import com.trend.lazyinject.demo.model.BaseModel;
 import com.trend.lazyinject.demo.model.BinderCallback;
 import com.trend.lazyinject.demo.model.ModelA;
@@ -95,5 +97,10 @@ public class TestComponentImpl implements TestComponent {
             }
         }).start();
         return new Bundle();
+    }
+
+    @Override
+    public Application c() {
+        return DemoApplication.application;
     }
 }

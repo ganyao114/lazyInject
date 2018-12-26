@@ -1,12 +1,10 @@
 package com.trend.lazyinject.lib;
 
 import android.content.Context;
-import android.util.Log;
 
-import com.trend.lazyinject.annotation.FieldGetHook;
+import com.trend.lazyinject.lib.weave.FieldGetHook;
 import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.InjectComponent;
-import com.trend.lazyinject.annotation.InjectInfo;
 import com.trend.lazyinject.lib.component.ComponentBuilder;
 import com.trend.lazyinject.lib.component.ComponentManager;
 import com.trend.lazyinject.lib.di.DIImpl;

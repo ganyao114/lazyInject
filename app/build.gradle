@@ -23,15 +23,14 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 }
-//
+
 //aspectjx {
-//    include 'trend'
-
+//    optimize true
 //}
 
-//lazyinject {
-//    enable true
-//}
+lazyinject {
+    optimize true
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

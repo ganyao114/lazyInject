@@ -1,4 +1,7 @@
-package com.trend.lazyinject.annotation;
+package com.trend.lazyinject.lib.weave;
+
+import com.trend.lazyinject.annotation.Inject;
+import com.trend.lazyinject.annotation.InjectComponent;
 
 import java.lang.reflect.Field;
 
