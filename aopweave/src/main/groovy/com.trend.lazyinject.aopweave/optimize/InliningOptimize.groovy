@@ -11,13 +11,13 @@ import javassist.expr.FieldAccess
 
 import java.util.concurrent.ConcurrentHashMap
 
-public class InlingOptimize {
+public class InliningOptimize {
 
     ClassPool classPool
 
     Map<CtField, CtMethod> methods = new ConcurrentHashMap<>()
 
-    InlingOptimize(ClassPool classPool) {
+    InliningOptimize(ClassPool classPool) {
         this.classPool = classPool
     }
 

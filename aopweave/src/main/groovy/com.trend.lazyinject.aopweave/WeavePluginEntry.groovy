@@ -5,17 +5,15 @@ import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.collect.ImmutableSet
 import com.trend.lazyinject.annotation.Inject
 import com.trend.lazyinject.annotation.InjectComponent
-import com.trend.lazyinject.aopweave.annotation.AnnotationParser
 import com.trend.lazyinject.aopweave.classes.ClassContainer
 import com.trend.lazyinject.aopweave.classes.ClassGetter
 import com.trend.lazyinject.aopweave.config.WeaveConfig
-import com.trend.lazyinject.aopweave.optimize.InlingOptimize
+import com.trend.lazyinject.aopweave.optimize.InliningOptimize
 import com.trend.lazyinject.aopweave.weave.InjectComponentWeave
 import com.trend.lazyinject.aopweave.weave.InjectWeave
 import javassist.CannotCompileException
 import javassist.ClassPool
 import javassist.CtClass
-import javassist.Modifier
 import javassist.NotFoundException
 import javassist.WeaveClassPool
 import javassist.expr.ExprEditor
@@ -108,7 +106,7 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
         if (config.enable) {
 
-            InlingOptimize inlingOptimize = new InlingOptimize(classPool)
+            InliningOptimize inlingOptimize = new InliningOptimize(classPool)
 
             new ForkJoinPool().submit {
                 classContainer.classes.parallelStream().findAll { ctClass ->
