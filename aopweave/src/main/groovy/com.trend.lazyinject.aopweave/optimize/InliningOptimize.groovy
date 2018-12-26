@@ -129,8 +129,14 @@ public class InliningOptimize {
         return "lazyInject_get_${field.getName()}"
     }
 
-    public static String isLzOptimizedSetter(CtMethod ctMethod) {
+    public static boolean isLzOptimizedSetter(CtMethod ctMethod) {
         return ctMethod.getName().startsWith("lazyInject_get_")
+    }
+
+    public static boolean isLzOptimizedSetter(String ctMethod) {
+        if (ctMethod == null)
+            return false
+        return ctMethod.startsWith("lazyInject_get_")
     }
 
     class InjectOptimizeInfo {

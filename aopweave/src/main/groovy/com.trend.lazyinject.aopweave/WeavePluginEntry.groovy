@@ -13,6 +13,7 @@ import com.trend.lazyinject.aopweave.weave.InjectComponentWeave
 import com.trend.lazyinject.aopweave.weave.InjectWeave
 import javassist.CannotCompileException
 import javassist.ClassPool
+import javassist.CtBehavior
 import javassist.CtClass
 import javassist.NotFoundException
 import javassist.WeaveClassPool
@@ -137,6 +138,12 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                     Inject inject = f.field.getAnnotation(Inject.class)
                                     InjectComponent injectComponent = f.field.getAnnotation(InjectComponent.class)
                                     if (inject != null) {
+                                        CtBehavior where = f.where()
+                                        if (where != null) {
+                                            if (InliningOptimize.isLzOptimizedSetter(where.name)) {
+                                                return
+                                            }
+                                        }
                                         if (f.reader) {
                                             if (config.optimize) {
                                                 if (!inliningOptimize.optimize(f, false)) {
@@ -147,6 +154,12 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                             }
                                         }
                                     } else if (injectComponent != null) {
+                                        CtBehavior where = f.where()
+                                        if (where != null) {
+                                            if (InliningOptimize.isLzOptimizedSetter(where.name)) {
+                                                return
+                                            }
+                                        }
                                         InjectComponentWeave.inject(f)
                                     }
                                 }
