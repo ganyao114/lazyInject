@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Context context;
 
     @Inject(component = TestComponentB.class)
-    TestComponentB.Inner inner;
+    static TestComponentB.Inner inner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

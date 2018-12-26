@@ -7,6 +7,7 @@ import javassist.ClassPool
 import javassist.CtField
 import javassist.CtMethod
 import javassist.CtNewMethod
+import javassist.Modifier
 import javassist.expr.FieldAccess
 
 import java.util.concurrent.ConcurrentHashMap
@@ -34,6 +35,9 @@ public class InliningOptimize {
                 targetMethod = CtNewMethod.make(field.type, getMethodName(field), null, null, generateInjectOptimizedMethod(field, injectOptimizeInfo), field.declaringClass)
             }
             if (targetMethod != null) {
+                if (Modifier.isStatic(field.getModifiers())) {
+                    targetMethod.setModifiers(Modifier.STATIC | Modifier.PUBLIC)
+                }
                 field.declaringClass.addMethod(targetMethod)
             }
             return targetMethod
@@ -68,10 +72,17 @@ public class InliningOptimize {
 
     public String generateInjectOptimizedMethod(CtField field, InjectOptimizeInfo optimizeInfo) {
 
-        String fieldName = "this." + field.name
+        String fieldName
+
+        if (Modifier.isStatic(field.getModifiers())) {
+            fieldName = field.declaringClass.name + "." + field.name
+        } else {
+            fieldName = "this." + field.name
+        }
+
         String componentType = optimizeInfo.annoInfo.component.name
         String providerName = optimizeInfo.providerMethod.name
-        String lock = "\"" + "INJECT_LOCK-" + field.declaringClass.name + "." + "field.name" + "@" + " + hashCode()" + "\""
+        String lock = "\"" + "INJECT_LOCK-" + field.declaringClass.name + "." + field.name + "@" + " + hashCode()" + "\""
 
         if (optimizeInfo.annoInfo.alwaysRefresh) {
             return " {\n" +
