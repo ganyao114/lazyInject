@@ -9,4 +9,10 @@ import com.trend.lazyinject.annotation.Provide;
 public interface TestComponentB {
     @Provide
     Context c();
+    @Provide
+    Inner inner();
+
+    interface Inner {
+        void doSth();
+    }
 }

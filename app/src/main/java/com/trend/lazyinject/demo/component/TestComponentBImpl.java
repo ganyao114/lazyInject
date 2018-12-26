@@ -11,4 +11,14 @@ public class TestComponentBImpl implements TestComponentB {
     public Context c() {
         return DemoApplication.application;
     }
+
+    @Override
+    public Inner inner() {
+        return new Inner() {
+            @Override
+            public void doSth() {
+
+            }
+        };
+    }
 }

@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Inject(component = TestComponentB.class)
     Context context;
 
+    @Inject(component = TestComponentB.class)
+    TestComponentB.Inner inner;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,6 +101,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (context != null) {
             Log.d("test", "Context inject success = " + context.toString());
+        }
+
+        if (inner != null) {
+            Log.d("test", "Inner inject success = " + inner.toString());
         }
         if (nullProtectTestA != null) {
             nullProtectTestA.test1();

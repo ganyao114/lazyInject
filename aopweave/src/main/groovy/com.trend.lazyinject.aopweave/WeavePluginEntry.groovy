@@ -106,7 +106,7 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
         if (config.enable) {
 
-            InliningOptimize inlingOptimize = new InliningOptimize(classPool)
+            InliningOptimize inliningOptimize = new InliningOptimize(classPool)
 
             new ForkJoinPool().submit {
                 classContainer.classes.parallelStream().findAll { ctClass ->
@@ -139,7 +139,7 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                     if (inject != null) {
                                         if (f.reader) {
                                             if (config.optimize) {
-                                                if (!inlingOptimize.optimize(f, false)) {
+                                                if (!inliningOptimize.optimize(f, false)) {
                                                     InjectWeave.inject(f)
                                                 }
                                             } else {

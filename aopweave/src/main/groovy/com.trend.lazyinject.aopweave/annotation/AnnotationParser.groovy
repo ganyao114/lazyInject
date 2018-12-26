@@ -60,6 +60,9 @@ public class AnnotationParser {
 
         if (Inject.None.name.equals(component)) {
             info.component = field.type.declaringClass
+            if (info.component == null) {
+                info.component = getEnclosingClass(field.type, classPool)
+            }
             if (info.component == null)
                 return null
         } else {
@@ -71,6 +74,15 @@ public class AnnotationParser {
         info.args = argsValue == null ? "null" : "new String[]" + argsValue.toString()
 
         return info
+    }
+
+    public static CtClass getEnclosingClass(CtClass ctClass, ClassPool classPool) {
+        String className = ctClass.name
+        int index = className.lastIndexOf('$')
+        if (index < 0)
+            return null
+        className = className.substring(0, index - 1)
+        return classPool.get(className)
     }
 
 }
