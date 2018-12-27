@@ -82,7 +82,7 @@ public class InliningOptimize {
 
         String componentType = optimizeInfo.annoInfo.component.name
         String providerName = optimizeInfo.providerMethod.name
-        String lock = "\"" + "INJECT_LOCK-" + field.declaringClass.name + "." + field.name + "@" + " + hashCode()" + "\""
+        String lock = "(\"" + "LZ_LOCK_" + field.name + "@" + "\"" + " + hashCode())"
 
         if (optimizeInfo.annoInfo.alwaysRefresh) {
             return " {\n" +
