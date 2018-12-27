@@ -380,7 +380,14 @@ public class TestComponentImpl implements TestComponent {
       android:process="com.trend.lazyinject.demo.p1" />
 ```
 因为需要 IPC，所以所有 Provider 方法的参数和返回值必须继承自 Serializable/Parcelable/IBinder
-你也可以直接调用 Component 中的方法，这些都是支持 IPC 的
+你也可以直接调用 Component 中的方法，这些都是支持 IPC 的. 
+### 不使用 Aspectj 而使用自带的 plugin 进行 hook FieldAccess
+分支 aopweave 实现了 aspectj 类似的功能，在编译期间 hook field get
+选择自己实现的理由在于使用中发现，Aspectj 生成了太多的无关代码，而这些都是本框架所不需要的  
+自己实现的 AopWeave 带来了以下好处  
+
+- 极大减少增加的代码，从 Java 代码来看，仅仅将 Field Get -> Method Call
+- 类似内联的优化，当编译期间可以确定被注入对象所需要的 Provider 时，将会在编译期间直接调用该 Provider 方法，这样在运行时几乎不需要做反射
 # 实现原理  
 [Design Document](https://github.com/ganyao114/lazyInject/blob/master/doc/di_design.md)
 
