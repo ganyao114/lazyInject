@@ -3,6 +3,7 @@ package com.trend.lazyinject.aopweave.annotation
 import com.trend.lazyinject.annotation.Inject
 import com.trend.lazyinject.annotation.InjectComponent
 import com.trend.lazyinject.aopweave.infos.InjectAnnoInfo
+import com.trend.lazyinject.aopweave.infos.InjectComponentAnnoInfo
 import javassist.ClassPool
 import javassist.CtClass
 import javassist.CtField
@@ -72,6 +73,24 @@ public class AnnotationParser {
         info.alwaysRefresh = refreshValue == null ? false : refreshValue.value
         info.nullProtect = nullProtectValue == null ? false : nullProtectValue.value
         info.args = argsValue == null ? "null" : "new String[]" + argsValue.toString()
+
+        return info
+    }
+
+    public static InjectComponentAnnoInfo getInjectComponentInfo(CtField field, ClassPool classPool) {
+
+        AnnotationsAttribute attribute = (AnnotationsAttribute) field.fieldInfo.getAttribute(AnnotationsAttribute.visibleTag)
+        Annotation annotation = attribute.getAnnotation(InjectComponent.class.getName())
+        StringMemberValue vValue = annotation.getMemberValue("value")
+        BooleanMemberValue refreshValue = annotation.getMemberValue("alwaysRefresh")
+        BooleanMemberValue nullProtectValue = annotation.getMemberValue("nullProtect")
+
+        InjectComponentAnnoInfo info = new InjectComponentAnnoInfo()
+
+
+        info.alwaysRefresh = refreshValue == null ? false : refreshValue.value
+        info.nullProtect = nullProtectValue == null ? false : nullProtectValue.value
+        info.value = vValue == null ? "null" : vValue.toString()
 
         return info
     }

@@ -140,7 +140,7 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                     if (inject != null) {
                                         CtBehavior where = f.where()
                                         if (where != null) {
-                                            if (InliningOptimize.isLzOptimizedSetter(where.name)) {
+                                            if (InliningOptimize.isLzOptimizedMethod(where.name)) {
                                                 return
                                             }
                                         }
@@ -156,11 +156,19 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                     } else if (injectComponent != null) {
                                         CtBehavior where = f.where()
                                         if (where != null) {
-                                            if (InliningOptimize.isLzOptimizedSetter(where.name)) {
+                                            if (InliningOptimize.isLzOptimizedMethod(where.name)) {
                                                 return
                                             }
                                         }
-                                        InjectComponentWeave.inject(f)
+                                        if (f.reader) {
+                                            if (config.optimize) {
+                                                if (!inliningOptimize.optimize(f, true)) {
+                                                    InjectComponentWeave.inject(f)
+                                                }
+                                            } else {
+                                                InjectComponentWeave.inject(f)
+                                            }
+                                        }
                                     }
                                 }
                             })
