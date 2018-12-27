@@ -69,15 +69,15 @@ dependencies {
 *;
 }
 
--keepclassmembers class ** {
+-keepclassmembers,allowobfuscation class * {
     @com.trend.lazyinject.annotation.Provide <methods>;
 }
 
--keepclassmembers class ** {
+-keepclassmembers class * {
      @com.trend.lazyinject.annotation.Inject <fields>;
 }
 
--keepclassmembers class ** {
+-keepclassmembers class * {
      @com.trend.lazyinject.annotation.InjectComponent <fields>;
 }
 
