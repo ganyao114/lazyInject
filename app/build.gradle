@@ -14,7 +14,7 @@ android {
     buildTypes {
         debug {
             debuggable true
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), '../proguard-rules.pro'
         }
     }
@@ -29,6 +29,7 @@ android {
 //}
 
 lazyinject {
+    enable false
     optimize true
 }
 

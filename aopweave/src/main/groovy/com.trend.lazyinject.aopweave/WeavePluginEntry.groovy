@@ -3,20 +3,17 @@ package com.trend.lazyinject.aopweave
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.collect.ImmutableSet
+import com.intellij.openapi.util.io.FileUtil
 import com.trend.lazyinject.annotation.Inject
 import com.trend.lazyinject.annotation.InjectComponent
 import com.trend.lazyinject.aopweave.classes.ClassContainer
 import com.trend.lazyinject.aopweave.classes.ClassGetter
 import com.trend.lazyinject.aopweave.config.WeaveConfig
+import com.trend.lazyinject.aopweave.files.FileCopy
 import com.trend.lazyinject.aopweave.optimize.InliningOptimize
 import com.trend.lazyinject.aopweave.weave.InjectComponentWeave
 import com.trend.lazyinject.aopweave.weave.InjectWeave
-import javassist.CannotCompileException
-import javassist.ClassPool
-import javassist.CtBehavior
-import javassist.CtClass
-import javassist.NotFoundException
-import javassist.WeaveClassPool
+import javassist.*
 import javassist.expr.ExprEditor
 import javassist.expr.FieldAccess
 import org.gradle.api.Plugin
@@ -43,6 +40,8 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
         project.android.registerTransform(this)
     }
 
+
+
     @Override
     String getName() {
         return "lazyinject-weave"
@@ -50,28 +49,12 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
 
     @Override
     Set<QualifiedContent.ContentType> getInputTypes() {
-        return TransformManager.CONTENT_CLASS
+        return ImmutableSet.<QualifiedContent.Scope> of(QualifiedContent.DefaultContentType.CLASSES)
     }
 
     @Override
     Set<QualifiedContent.Scope> getScopes() {
-        def name = QualifiedContent.Scope.PROJECT_LOCAL_DEPS.name()
-        def deprecated = QualifiedContent.Scope.PROJECT_LOCAL_DEPS.getClass()
-                .getField(name).getAnnotation(Deprecated.class)
-
-        if (deprecated == null) {
-            println "cannot find QualifiedContent.Scope.PROJECT_LOCAL_DEPS Deprecated.class "
-            return ImmutableSet.<QualifiedContent.Scope> of(QualifiedContent.Scope.PROJECT
-                    , QualifiedContent.Scope.PROJECT_LOCAL_DEPS
-                    , QualifiedContent.Scope.EXTERNAL_LIBRARIES
-                    , QualifiedContent.Scope.SUB_PROJECTS
-                    , QualifiedContent.Scope.SUB_PROJECTS_LOCAL_DEPS)
-        } else {
-            println "find QualifiedContent.Scope.PROJECT_LOCAL_DEPS"
-            return ImmutableSet.<QualifiedContent.Scope> of(QualifiedContent.Scope.PROJECT
-                    , QualifiedContent.Scope.EXTERNAL_LIBRARIES
-                    , QualifiedContent.Scope.SUB_PROJECTS)
-        }
+        return TransformManager.SCOPE_FULL_PROJECT
     }
 
     @Override
@@ -83,27 +66,42 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
     void transform(TransformInvocation transformInvocation) throws TransformException, InterruptedException, IOException {
         super.transform(transformInvocation)
 
+
+
         Context context = transformInvocation.context
         Collection<TransformInput> inputs = transformInvocation.inputs
         Collection<TransformInput> referencedInputs = transformInvocation.referencedInputs
         TransformOutputProvider outputProvider = transformInvocation.outputProvider
         boolean isIncremental = transformInvocation.incremental
 
-        WeaveClassPool classPool = new WeaveClassPool()
+        File outputDirFile = outputProvider.getContentLocation("main", outputTypes, scopes, Format.DIRECTORY);
 
-        project.android.bootClasspath.each {
-            classPool.appendClassPath((String)it.absolutePath)
+        if (config.enable) {
+
+            long start = System.currentTimeMillis();
+
+            logger.info("LazyInject - start weave")
+
+            WeaveClassPool classPool = new WeaveClassPool()
+            project.android.bootClasspath.each {
+                classPool.appendClassPath((String) it.absolutePath)
+            }
+            ClassContainer classContainer = ClassGetter.toCtClasses(inputs, classPool, config)
+            doWeave(classContainer, outputDirFile, classPool, isIncremental)
+
+            logger.info("LazyInject - end weave - cost time:" + (System.currentTimeMillis() - start) + " ms")
+
+        } else {
+            if (isIncremental) {
+                FileCopy.incrementalCopy(inputs, outputProvider)
+            } else {
+                FileCopy.fullCopy(inputs, outputProvider)
+            }
         }
-
-        ClassContainer classContainer = ClassGetter.toCtClasses(inputs, classPool, config)
-
-        doWeave(classContainer, outputProvider.getContentLocation("main", outputTypes, scopes, Format.DIRECTORY), classPool)
-
-
 
     }
 
-    void doWeave(ClassContainer classContainer, File outputDir, ClassPool classPool) {
+    void doWeave(ClassContainer classContainer, File outputDir, ClassPool classPool, boolean isIncremental) {
 
         if (config.enable) {
 
@@ -145,7 +143,7 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                             }
                                         }
                                         if (f.reader) {
-                                            if (config.optimize) {
+                                            if (config.optimize && !isIncremental) {
                                                 if (!inliningOptimize.optimize(f, false)) {
                                                     InjectWeave.inject(f)
                                                 }
@@ -161,7 +159,7 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
                                             }
                                         }
                                         if (f.reader) {
-                                            if (config.optimize) {
+                                            if (config.optimize && !isIncremental) {
                                                 if (!inliningOptimize.optimize(f, true)) {
                                                     InjectComponentWeave.inject(f)
                                                 }

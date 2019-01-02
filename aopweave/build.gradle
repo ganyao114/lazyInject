@@ -10,6 +10,7 @@ dependencies {
     compile 'com.android.tools.build:gradle:3.0.1'
 //    compile "org.aspectj:aspectjtools:1.8.13"
     compile 'org.javassist:javassist:3.22.0-GA'
+    compile 'com.android.tools.build:transform-api:2.0.0-deprecated-use-gradle-api'
     //for local debug
     compile 'com.trend.lazyinject:annotation:0.0.1-local'
     //for upload cloud
