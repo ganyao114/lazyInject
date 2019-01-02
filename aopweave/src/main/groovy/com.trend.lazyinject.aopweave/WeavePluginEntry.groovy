@@ -3,11 +3,10 @@ package com.trend.lazyinject.aopweave
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.google.common.collect.ImmutableSet
-import com.intellij.openapi.util.io.FileUtil
 import com.trend.lazyinject.annotation.Inject
 import com.trend.lazyinject.annotation.InjectComponent
 import com.trend.lazyinject.aopweave.classes.ClassContainer
-import com.trend.lazyinject.aopweave.classes.ClassGetter
+import com.trend.lazyinject.aopweave.classes.JavassistClassGetter
 import com.trend.lazyinject.aopweave.config.WeaveConfig
 import com.trend.lazyinject.aopweave.files.FileCopy
 import com.trend.lazyinject.aopweave.optimize.InliningOptimize
@@ -86,7 +85,7 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
             project.android.bootClasspath.each {
                 classPool.appendClassPath((String) it.absolutePath)
             }
-            ClassContainer classContainer = ClassGetter.toCtClasses(inputs, classPool, config)
+            ClassContainer classContainer = JavassistClassGetter.toCtClasses(inputs, classPool, config)
             doWeave(classContainer, outputDirFile, classPool, isIncremental)
 
             logger.info("LazyInject - end weave - cost time:" + (System.currentTimeMillis() - start) + " ms")

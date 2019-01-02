@@ -5,11 +5,13 @@ import com.android.build.api.transform.TransformInput
 import com.trend.lazyinject.aopweave.config.WeaveConfig
 import javassist.ClassPool
 import javassist.CtClass
+import javassist.DirClassPath
+import javassist.JarClassPath
 import org.apache.commons.io.FileUtils
 
 import java.util.jar.JarFile
 
-class ClassGetter {
+class JavassistClassGetter {
 
     static ClassContainer toCtClasses(Collection<TransformInput> inputs, ClassPool classPool, WeaveConfig config) {
         HashSet<String> classNames = new HashSet<>()
@@ -66,6 +68,20 @@ class ClassGetter {
             container.classes.add(ctClass)
         } else {
             container.classesNotScan.add(ctClass)
+        }
+    }
+
+    static void addClassPath(List<File> files, ClassPool classPool) {
+        //节省编译时的内存消耗
+        ClassPool.doPruning = true
+        for (File file : files) {
+            if (file.exists()) {
+                if (file.isDirectory()) {
+                    classPool.appendClassPath(new DirClassPath(file.absolutePath))
+                } else {
+                    classPool.appendClassPath(new JarClassPath(file.absolutePath))
+                }
+            }
         }
     }
 }
