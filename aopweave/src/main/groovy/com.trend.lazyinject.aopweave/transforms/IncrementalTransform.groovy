@@ -17,7 +17,11 @@ import java.util.zip.ZipOutputStream
 
 abstract class IncrementalTransform extends Transform {
 
+    static final String TMP_DIR = "lztmp"
+
     Project project
+
+    File buildDir
 
     Logger logger
 
@@ -64,6 +68,7 @@ abstract class IncrementalTransform extends Transform {
     IncrementalTransform(Project project) {
         this.project = project
         this.logger = project.logger
+        this.buildDir = project.buildDir
     }
 
     @Override
@@ -300,9 +305,8 @@ abstract class IncrementalTransform extends Transform {
     void flushForFile(File file, FileNeedInject fileNeedInject) {
         final int index = file.absolutePath.indexOf(getName()) + getName().length()
         Closure handleFileClosure = { File innerFile ->
-            String filePath = innerFile.absolutePath
-            if (fileNeedInject.jarBytes != null) {
-                def outputFile = new File(buildDir, TMP_DIR + innerFile.absolutePath.substring(index))
+            if (fileNeedInject.classBytes != null) {
+                def outputFile = new File(buildDir, getTmpDir() + innerFile.absolutePath.substring(index))
                 Files.createParentDirs(outputFile)
                 FileInputStream inputStream = new FileInputStream(innerFile)
                 FileOutputStream outputStream = new FileOutputStream(outputFile)
@@ -327,7 +331,7 @@ abstract class IncrementalTransform extends Transform {
 
     void flushForJar(File outJarFile, FileNeedInject fileNeedInject) {
         final int index = outJarFile.absolutePath.indexOf(getName()) + getName().length()
-        final def tmpFile = new File(buildDir, TMP_DIR + outJarFile.absolutePath.substring(index))
+        final def tmpFile = new File(buildDir, getTmpDir() + outJarFile.absolutePath.substring(index))
         Files.createParentDirs(tmpFile)
 
         new ZipInputStream(new FileInputStream(outJarFile)).withCloseable { zis ->
@@ -354,6 +358,10 @@ abstract class IncrementalTransform extends Transform {
 
     void log(String msg) {
         logger.info("LazyInject<" + getName() + "> - " + msg)
+    }
+
+    String getTmpDir() {
+        return TMP_DIR + File.separatorChar + getName() + File.separatorChar
     }
 
 }
