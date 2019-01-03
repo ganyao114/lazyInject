@@ -10,6 +10,7 @@ import com.trend.lazyinject.aopweave.classes.JavassistClassGetter
 import com.trend.lazyinject.aopweave.config.WeaveConfig
 import com.trend.lazyinject.aopweave.files.FileCopy
 import com.trend.lazyinject.aopweave.optimize.InliningOptimize
+import com.trend.lazyinject.aopweave.transforms.LazyInjectTransform
 import com.trend.lazyinject.aopweave.weave.InjectComponentWeave
 import com.trend.lazyinject.aopweave.weave.InjectWeave
 import javassist.*
@@ -32,11 +33,11 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
     void apply(Project project) {
         this.project = project
 
-        project.extensions.create("lazyinject",WeaveConfig)
-        logger = project.logger
-        config = project.lazyinject
+        project.android.registerTransform(new LazyInjectTransform(project))
 
-        project.android.registerTransform(this)
+//        project.extensions.create("lazyinject",WeaveConfig)
+//        logger = project.logger
+//        config = project.lazyinject
     }
 
 

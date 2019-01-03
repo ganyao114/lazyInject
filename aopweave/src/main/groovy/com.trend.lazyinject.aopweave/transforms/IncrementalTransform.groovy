@@ -7,6 +7,7 @@ import com.android.utils.FileUtils
 import com.google.common.io.Files
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
+import org.stringtemplate.v4.ST
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ForkJoinPool
@@ -24,7 +25,9 @@ abstract class IncrementalTransform extends Transform {
     List<File> classPaths = new LinkedList<>()
     List<File> filesNeedInject = new LinkedList<>()
 
-    Map<String,FileNeedInject> dirtyFile = new ConcurrentHashMap<>()
+    Map<String, FileNeedInject> dirtyFile = new ConcurrentHashMap<>()
+
+    Set<String> dirtyClassName = new HashSet<>()
 
     void addDirtyClass(String filePath, String jarEntryName, byte[] classBytes) {
         FileNeedInject fileNeedInject = dirtyFile.get(filePath)
@@ -50,13 +53,17 @@ abstract class IncrementalTransform extends Transform {
         }
     }
 
+    void addDirtyClassName(String className) {
+        dirtyClassName << className
+    }
+
+    boolean isClassDirty(String className) {
+        return dirtyClassName.contains(className)
+    }
+
     IncrementalTransform(Project project) {
         this.project = project
         this.logger = project.logger
-        //add system boot classpath
-        project.android.bootClasspath.each {
-            classPaths << it
-        }
     }
 
     @Override
@@ -75,6 +82,11 @@ abstract class IncrementalTransform extends Transform {
         // as the secondary file is will trigger a full build if modified.
         if (!invocation.isIncremental()) {
             outputProvider.deleteAll()
+        }
+
+        //add system boot classpath
+        project.android.bootClasspath.each {
+            classPaths << it
         }
 
         //transform 开始回调
@@ -224,7 +236,6 @@ abstract class IncrementalTransform extends Transform {
      * @param outJarFile 根据 JarInput 生成的 File
      */
 
-
     /**
      * Transform.transform() 接口结束时回调
      */
@@ -286,8 +297,8 @@ abstract class IncrementalTransform extends Transform {
     }
 
 
-    private void flushForFile(File file, FileNeedInject fileNeedInject) {
-        final int index = file.absolutePath.indexOf(getName()) + getName()
+    void flushForFile(File file, FileNeedInject fileNeedInject) {
+        final int index = file.absolutePath.indexOf(getName()) + getName().length()
         Closure handleFileClosure = { File innerFile ->
             String filePath = innerFile.absolutePath
             if (fileNeedInject.jarBytes != null) {
@@ -314,7 +325,7 @@ abstract class IncrementalTransform extends Transform {
         }
     }
 
-    private void flushForJar(File outJarFile, FileNeedInject fileNeedInject) {
+    void flushForJar(File outJarFile, FileNeedInject fileNeedInject) {
         final int index = outJarFile.absolutePath.indexOf(getName()) + getName().length()
         final def tmpFile = new File(buildDir, TMP_DIR + outJarFile.absolutePath.substring(index))
         Files.createParentDirs(tmpFile)

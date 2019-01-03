@@ -4,6 +4,7 @@ import com.trend.lazyinject.aopweave.annotation.AnnotationParser
 import com.trend.lazyinject.aopweave.infos.InjectAnnoInfo
 import com.trend.lazyinject.aopweave.infos.InjectComponentAnnoInfo
 import com.trend.lazyinject.aopweave.provider.ProviderSeach
+import com.trend.lazyinject.aopweave.weave.ClassChangeListener
 import javassist.ClassPool
 import javassist.CtField
 import javassist.CtMethod
@@ -19,8 +20,20 @@ public class InliningOptimize {
 
     Map<CtField, CtMethod> methods = new ConcurrentHashMap<>()
 
+    ClassChangeListener classChangeListener
+
     InliningOptimize(ClassPool classPool) {
         this.classPool = classPool
+        setClassChangeListener(new ClassChangeListener() {
+            @Override
+            void onClassChanged(String className) {
+
+            }
+        })
+    }
+
+    void setClassChangeListener(ClassChangeListener classChangeListener) {
+        this.classChangeListener = classChangeListener
     }
 
     public boolean optimize(FieldAccess fieldAccess, boolean isInjectComponent) {
@@ -43,12 +56,14 @@ public class InliningOptimize {
                     targetMethod.setModifiers(Modifier.STATIC | Modifier.PUBLIC)
                 }
                 field.declaringClass.addMethod(targetMethod)
+                classChangeListener.onClassChanged(field.declaringClass.name)
             }
             return targetMethod
         })
         if (method == null)
             return false
         fieldAccess.replace("\$_ = \$0.${method.name}();")
+        classChangeListener.onClassChanged(fieldAccess.where().declaringClass.name)
         return true
     }
 

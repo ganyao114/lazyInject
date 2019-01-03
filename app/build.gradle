@@ -1,8 +1,10 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'android-aspectjx'
-apply plugin: 'lazyinject-weave'
+apply plugin: 'lazyInject'
+
 android {
     compileSdkVersion 26
+    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.trend.lazyinject.demo"
         minSdkVersion 15
@@ -29,7 +31,7 @@ android {
 //}
 
 lazyinject {
-    enable false
+    enable true
     optimize true
 }
 
