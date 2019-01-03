@@ -1,22 +1,20 @@
 package com.trend.lazyinject.aopweave.jar
 
-import com.android.build.api.transform.JarInput
-
 import java.util.jar.JarEntry
-import java.util.jar.JarFile;
+import java.util.jar.JarFile
 
 public class ClassFilter {
 
-    static boolean isIncludeFilterMatched(String str, List<String> filters) {
+    static boolean isIncludeFilterMatched(String str, String[] filters) {
         return isFilterMatched(str, filters)
     }
 
-    static boolean isFilterMatched(String str, List<String> filters) {
+    static boolean isFilterMatched(String str, String[] filters) {
         if(str == null) {
             return false
         }
 
-        if (filters == null || filters.isEmpty()) {
+        if (filters == null || filters.length == 0) {
             return true
         }
 
@@ -62,15 +60,15 @@ public class ClassFilter {
         }
     }
 
-    public static boolean filterClass(String classPath, List<String> includes) {
+    public static boolean filterClass(String classPath, String[] includes) {
         return isIncludeFilterMatched(classPath, includes)
     }
 
-    public static boolean filterJar(JarInput jarInput, List<String> includes) {
-        if (includes == null || includes.isEmpty())
+    public static boolean filterJar(File file, String[] includes) {
+        if (includes == null || includes.length == 0)
             return true
         boolean isInclude = false
-        JarFile jarFile = new JarFile(jarInput.file)
+        JarFile jarFile = new JarFile(file)
         Enumeration<JarEntry> entries = jarFile.entries()
         while (entries.hasMoreElements()) {
             JarEntry jarEntry = entries.nextElement()

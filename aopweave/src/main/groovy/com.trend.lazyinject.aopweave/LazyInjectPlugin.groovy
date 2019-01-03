@@ -17,7 +17,7 @@ public class LazyInjectPlugin implements Plugin<Project> {
         project.android.registerTransform(new LazyInjectTransform(project))
 
         project.dependencies {
-            String version = project.rootProject.publishVersion
+            String version = "3.4.0-beta"
             if (project.gradle.gradleVersion > "4.0") {
                 implementation "com.trend.lazyinject:lib:${version}"
             } else {

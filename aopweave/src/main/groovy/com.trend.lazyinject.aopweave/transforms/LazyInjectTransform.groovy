@@ -180,7 +180,7 @@ public class LazyInjectTransform extends JavassistTransform {
 
     @Override
     boolean filter(JarInput jarInput) {
-        return ClassFilter.filterJar(jarInput, config.includes)
+        return ClassFilter.filterJar(jarInput.file, config.includes)
     }
 
     @Override
