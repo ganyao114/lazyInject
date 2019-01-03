@@ -17,6 +17,7 @@
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
+-ignorewarning
 -keepattributes *Annotation*
 #保留部分泛型信息，必要!
 -keepattributes Signature
@@ -40,6 +41,23 @@
 *;
 }
 
--keepclassmembers class * {
-    @com.trend.lazyinject.annotation.Component *;
+-keepclassmembers,allowobfuscation class * {
+    @com.trend.lazyinject.annotation.Provide <methods>;
 }
+
+-keepclassmembers class * {
+     @com.trend.lazyinject.annotation.Inject <fields>;
+}
+
+-keepclassmembers class * {
+     @com.trend.lazyinject.annotation.InjectComponent <fields>;
+}
+
+-dontwarn javassist.**
+
+#FingerprintUtils
+# MeiZuFingerprint
+-keep class com.fingerprints.service.** { *; }
+
+# SmsungFingerprint
+-keep class com.samsung.android.sdk.** { *; }

@@ -28,7 +28,6 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "org.aspectj:aspectjrt:1.8.+"
     compile project(path: ':annotation')
 }
 

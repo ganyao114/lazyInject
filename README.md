@@ -1,6 +1,37 @@
 # 1.lazyInject
 被动依赖注入框架 for Android
 
+## 特点
+
+- 被动注入，通过编译期间 hook field access 实现，无需手动调用 inject
+- 懒加载 or 实时更新，由于 hook 了每一个 GETFIELD/GETSTATIC 指令，使懒加载或者实时更新成为可能
+- 完整的范型匹配
+- 较少的反射，大多数情况下可以在编译期间直接匹配到 provider 方法
+- 支持静态变量注入
+- 跨进程注入
+- 支持增量编译/Instant Run
+- 支持 Proguard
+
+## 项目结构
+
+- app：example
+- annotation：注入使用的注解
+- aopweave：gradle plugin，编译期间 hook FiledAccess 并注入代码的织入器
+- compiler：注解处理器，用于组装注入容器 Component 和其实现
+- lib：运行时库
+- aspectjsupport：如果不使用内置的 aopweave hook FiledAccess，可以依赖此使用 aspectj hook
+- kotlinsupport：使用 kotlin 原生特性代理实现注入
+
+## 编译调试项目
+
+- 打包 annotation 到本地 maven repo
+./gradlew :annotation:uploadArchives
+- 打包 aopweave 到本地 maven repo
+./gradleW :aopweave:uploadArchives
+- 开始调试 gradle plugin
+./gradlew assembleDebug -Dorg.gradle.daemon=false -Dorg.gradle.debug=true --stacktrace  
+
+
  [ ![Download](https://api.bintray.com/packages/ganyao114/maven/lib/images/download.svg) ](https://bintray.com/ganyao114/maven/lib/_latestVersion)
 # 2.配置
 ## Gradle  
@@ -9,11 +40,18 @@
 buildscript {
     
     ...
+
+    repositories {
+        ...
+        maven {
+            url "https://dl.bintray.com/ganyao114/maven/"
+        }
+        ...
+    }
     
     dependencies {
         ...
-        //此依赖用于实现 AspectJ,如有其他合适项目可以自行替换，现由 https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx 实现
-        classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.1'
+        classpath 'com.trend.lazyinject:aopweave:3.4.0-beta'
         ...
     }
 }  
@@ -31,21 +69,29 @@ allprojects {
 }
 
 ```
-app 或者 lib/build.gradle
+app/build.gradle
 ```groovy
-//同上：如有其他 AspectJ 实现请自行替换
-apply plugin: 'android-aspectjx'
+apply plugin: 'lazyinject'
+
+lazyinject {
+    //是否开启注入
+    enable true
+    //启用编译期间类型匹配，可以减少运行期间反射，建议开启
+    optimize true
+    //包名数组，过滤需要注入的包，加快编译
+    includes "your pkg scope"
+}
 
 dependencies {
-    compile 'com.trend.lazyinject:lib:1.0.0'
-    annotationProcessor 'com.trend.lazyinject:compiler:1.0.0'
-    //如果使用 kotlin
-    compile 'com.trend.lazyinject:kotlinsupport:1.0.0'
+    ...
+    annotationProcessor 'com.trend.lazyinject:compiler:3.4.0-beta'
+    ...
 }
 
 ```  
 ## 混淆  
 ```proguard
+-ignorewarning
 -keepattributes *Annotation*
 #保留部分泛型信息，必要!
 -keepattributes Signature
@@ -69,9 +115,19 @@ dependencies {
 *;
 }
 
--keepclassmembers class * {
-    @com.trend.lazyinject.annotation.Component *;
+-keepclassmembers,allowobfuscation class * {
+    @com.trend.lazyinject.annotation.Provide <methods>;
 }
+
+-keepclassmembers class * {
+     @com.trend.lazyinject.annotation.Inject <fields>;
+}
+
+-keepclassmembers class * {
+     @com.trend.lazyinject.annotation.InjectComponent <fields>;
+}
+
+-dontwarn javassist.**
 ```  
 # 3.Example  
 ## Component  
@@ -314,7 +370,7 @@ public class LoginActivity extends AppCompatActivity implements LoginMVP.View {
 &nbsp;&nbsp;区别在于需要用户手动调用 LazyInject.inject(this);  
 &nbsp;&nbsp;不支持 alwaysRefresh
 
-### Provider 方法参数依赖注入  
+### Provider 方法参数依赖注入
 &nbsp;&nbsp;类似 Dagger Provider 方法可以带待注入的参数
 1. 如果不在参数列表上加 Inject 注解，则默认会在本模块中搜索合适的依赖
 2. 加上 Inject 或者 InjectComponent 则会注入对应模块的依赖，参考上面 Field 注入写法
@@ -362,16 +418,18 @@ android {
 LazyInject.setDebug(true);
 ```
 
-## 实验性功能
-### 在子进程实现 Component
-依赖 2.0.2-beta 版本可以使用此 Feature
-代码在 multi_process 分支
+## 在子进程实现 Component
+Component 的实现可以在子进程
+
 ```java
 @ComponentImpl(process = "com.trend.lazyinject.demo.p1")
 public class TestComponentImpl implements TestComponent {
     ...
+    Serializable/Parcelable/IBinder remoteProvider(Serializable/Parcelable/IBinder pars){}
+    ...
 }
 ```
+
 需要在 Manifest 中为子进程注册一个 StubProvider, authorities 必须与子进程名相同。注意不要 exported, 否则会有安全风险
 ```xml
 <provider
@@ -379,15 +437,9 @@ public class TestComponentImpl implements TestComponent {
       android:name="com.trend.lazyinject.lib.ipc.InjectIPCProvider"
       android:process="com.trend.lazyinject.demo.p1" />
 ```
-因为需要 IPC，所以所有 Provider 方法的参数和返回值必须继承自 Serializable/Parcelable/IBinder
-你也可以直接调用 Component 中的方法，这些都是支持 IPC 的. 
-### 不使用 Aspectj 而使用自带的 plugin 进行 hook FieldAccess
-分支 aopweave 实现了 aspectj 类似的功能，在编译期间 hook field get
-选择自己实现的理由在于使用中发现，Aspectj 生成了太多的无关代码，而这些都是本框架所不需要的  
-自己实现的 AopWeave 带来了以下好处  
 
-- 极大减少增加的代码，从 Java 代码来看，仅仅将 Field Get -> Method Call
-- 类似内联的优化，当编译期间可以确定被注入对象所需要的 Provider 时，将会在编译期间直接调用该 Provider 方法，这样在运行时几乎不需要做反射
+因为需要 IPC，所以所有 Provider 方法的参数和返回值必须继承自 Serializable/Parcelable/IBinder
+你也可以直接调用 Component 中的方法，这些都是支持 IPC 的
 # 实现原理  
 [Design Document](https://github.com/ganyao114/lazyInject/blob/master/doc/di_design.md)
 

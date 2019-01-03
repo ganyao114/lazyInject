@@ -8,17 +8,17 @@ public class StringArgsProvider extends DefaultProvider {
 
     int length;
 
-    public StringArgsProvider(Method providerMethod, int length) {
-        super(providerMethod);
+    public StringArgsProvider(Class componentType, Method providerMethod, int length) {
+        super(componentType, providerMethod);
         this.length = length;
     }
 
     @Override
     public Object doProvide(Object component, String... args) throws Throwable {
         if (!ValidateUtil.isEmpty(args)) {
-            return providerMethod.invoke(component, initStrings(args));
+            return invoke(component, initStrings(args));
         } else {
-            return providerMethod.invoke(component, initStrings(new String[length]));
+            return invoke(component, initStrings(new String[length]));
         }
     }
 

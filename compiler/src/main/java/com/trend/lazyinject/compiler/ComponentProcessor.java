@@ -93,6 +93,7 @@ public class ComponentProcessor extends AbstractProcessor {
             addBuildMethod(buildMapSpec);
             try {
                 JavaFile.builder(targetPkg, buildMapSpec.build())
+                        .addStaticImport(ClassName.get("com.trend.lazyinject.lib.component", "ComponentBuilder"), "doBuild")
                         .build()
                         .writeTo(filer);
             } catch (Throwable e) {
@@ -161,7 +162,7 @@ public class ComponentProcessor extends AbstractProcessor {
                 MethodSpec.Builder methodSpec = MethodSpec.methodBuilder("build" + implSimpleName)
                         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                         .returns(className)
-                        .addStatement("return new " + entity.componentImpl + "()");
+                        .addStatement("return doBuild(" + className + ".class, " + entity.componentImpl + ".class)");
                 if (!entity.cache) {
                     methodSpec.addAnnotation(NoCache.class);
                 }

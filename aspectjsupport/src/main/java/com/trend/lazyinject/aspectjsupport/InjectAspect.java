@@ -1,7 +1,7 @@
-package com.trend.lazyinject.lib.di;
+package com.trend.lazyinject.aspectjsupport;
 
 import com.trend.lazyinject.annotation.Inject;
-import com.trend.lazyinject.lib.component.ComponentManager;
+import com.trend.lazyinject.lib.di.DIImpl;
 import com.trend.lazyinject.lib.proxy.InterfaceProxy;
 import com.trend.lazyinject.lib.utils.ReflectUtils;
 import com.trend.lazyinject.lib.utils.ValidateUtil;
@@ -30,7 +30,7 @@ public class InjectAspect {
     @Around("pointcutInject(inject)")
     public Object aroundFieldGet(ProceedingJoinPoint joinPoint, Inject inject) throws Throwable {
         Object targetObj = joinPoint.getTarget();
-        Field field = ReflectUtils.getField(joinPoint, Inject.class);
+        Field field = ReflectionUtils.getField(joinPoint, Inject.class);
         if (field == null)
             return joinPoint.proceed();
         if (!field.isAccessible()) {
@@ -40,14 +40,18 @@ public class InjectAspect {
         if (!inject.alwaysRefresh()) {
             if (field.get(targetObj) != null)
                 return joinPoint.proceed();
-            res = getValue(inject.component(), field, inject.args());
-            if (res == null) {
-                if (inject.nullProtect()) {
-                    res = InterfaceProxy.make(field.getType());
+            synchronized (getInjectLock(field, targetObj)) {
+                if (field.get(targetObj) != null)
+                    return joinPoint.proceed();
+                res = getValue(inject.component(), field, inject.args());
+                if (res == null) {
+                    if (inject.nullProtect()) {
+                        res = InterfaceProxy.make(field.getType());
+                    }
+                    return res;
                 }
-                return res;
+                field.set(targetObj, res);
             }
-            field.set(targetObj, res);
         } else {
             res = getValue(inject.component(), field, inject.args());
             if (res == null) {
@@ -56,12 +60,11 @@ public class InjectAspect {
                 }
                 return res;
             }
-            field.set(targetObj, res);
         }
         return res;
     }
 
-    private final static Object getValue(Class type, Field field, String[] args) {
+    private static Object getValue(Class type, Field field, String[] args) {
         Object res = null;
         Class component = getComponentType(type, field);
         if (component == null)
@@ -73,7 +76,7 @@ public class InjectAspect {
         return res;
     }
 
-    private final static Class getComponentType(Class type, Field field) {
+    private static Class getComponentType(Class type, Field field) {
         Class component = type;
         if (component == Inject.None.class) {
             component = field.getType().getEnclosingClass();
@@ -81,6 +84,10 @@ public class InjectAspect {
                 return null;
         }
         return component;
+    }
+
+    private static Object getInjectLock(Field field, Object target) {
+        return ("LZ_DI_LOCK:" + field.hashCode() + "@" + (target != null ? System.identityHashCode(target) : "")).intern();
     }
 
 }

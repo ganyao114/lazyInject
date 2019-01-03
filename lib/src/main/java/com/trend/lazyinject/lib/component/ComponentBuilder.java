@@ -1,12 +1,22 @@
 package com.trend.lazyinject.lib.component;
 
+import android.text.TextUtils;
+
+import com.trend.lazyinject.annotation.ComponentImpl;
 import com.trend.lazyinject.annotation.DebugLog;
 import com.trend.lazyinject.annotation.NoCache;
+import com.trend.lazyinject.lib.LazyInject;
+import com.trend.lazyinject.lib.di.ComponentContainer;
 import com.trend.lazyinject.lib.di.DIImpl;
 import com.trend.lazyinject.lib.exception.ComponentBuildException;
+import com.trend.lazyinject.lib.ipc.IPCInvokeHandler;
+import com.trend.lazyinject.lib.ipc.InjectIPCClientManager;
 import com.trend.lazyinject.lib.log.LOG;
+import com.trend.lazyinject.lib.proxy.InterfaceProxy;
 import com.trend.lazyinject.lib.thread.ThreadPool;
+import com.trend.lazyinject.lib.utils.ProcessUtils;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Map;
@@ -78,6 +88,37 @@ public class ComponentBuilder {
         if (component == null)
             return null;
         return new BuildWrapper(component, builderMethod.isAnnotationPresent(NoCache.class));
+    }
+
+    public static <T> T doBuild(Class<T> componentType, Class<? extends T> componentImpl) {
+        ComponentImpl component = componentImpl.getAnnotation(ComponentImpl.class);
+        if (component == null) {
+            return newInstance(componentImpl);
+        }
+        if (TextUtils.isEmpty(component.process())) {
+            return newInstance(componentImpl);
+        } else {
+            if (TextUtils.equals(ProcessUtils.getProcessName(LazyInject.context()), component.process())) {
+                return newInstance(componentImpl);
+            } else {
+                ComponentContainer container = DIImpl.registerProvider(componentType);
+                if (container != null) {
+                    container.setNeedIPC(true);
+                    InjectIPCClientManager.setIPCProcess(componentType, component.process());
+                }
+                if (!componentType.isInterface())
+                    throw new ComponentBuildException(componentType.getName() + " - component must be a interface when invoke ipc!");
+                return InterfaceProxy.make(componentType, new IPCInvokeHandler(componentType));
+            }
+        }
+    }
+
+    private static <T> T newInstance(Class<T> clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static <T> Class<? extends T> getRawType(Class<T> inter) {

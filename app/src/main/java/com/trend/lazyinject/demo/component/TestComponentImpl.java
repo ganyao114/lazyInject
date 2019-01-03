@@ -1,10 +1,22 @@
 package com.trend.lazyinject.demo.component;
 
+import android.app.Application;
+import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.util.Log;
+
 import com.trend.lazyinject.annotation.ComponentImpl;
 import com.trend.lazyinject.annotation.DebugLog;
 import com.trend.lazyinject.annotation.InjectComponent;
+import com.trend.lazyinject.demo.application.DemoApplication;
 import com.trend.lazyinject.demo.model.BaseModel;
+import com.trend.lazyinject.demo.model.BinderCallback;
 import com.trend.lazyinject.demo.model.ModelA;
+import com.trend.lazyinject.demo.model.RemoteCallback;
+import com.trend.lazyinject.lib.LazyInject;
+import com.trend.lazyinject.lib.log.LOG;
+import com.trend.lazyinject.lib.utils.ProcessUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +26,7 @@ import java.util.Map;
 /**
  * Created by swift_gan on 2018/4/17.
  */
-@ComponentImpl
+@ComponentImpl(process = "com.trend.lazyinject.demo.p1")
 public class TestComponentImpl implements TestComponent {
 
     public TestComponentImpl() {
@@ -38,8 +50,8 @@ public class TestComponentImpl implements TestComponent {
     }
     @DebugLog
     @Override
-    public ModelA provide4(Map strings,String test , TestComponent testComponent) {
-        return new ModelA();
+    public ModelA provide4(Map strings,String test) {
+        return new ModelA(ProcessUtils.getProcessName(LazyInject.context()));
     }
     @DebugLog
     @Override
@@ -55,5 +67,40 @@ public class TestComponentImpl implements TestComponent {
     @Override
     public Map<String, ? extends ArrayList> provide7() {
         return new HashMap<>();
+    }
+
+    @Override
+    public Bundle provide8TestForParcel() {
+        return new Bundle();
+    }
+
+    @Override
+    public Bundle invokeTestForParcel(String a, ModelA modelA, Bundle bundle, IBinder callback) {
+        Log.e("ipc invoke - " + a + modelA.toString(), bundle.toString());
+        BinderCallback cb = BinderCallback.Stub.asInterface(callback);
+        new Thread(() -> {
+            int i = 10;
+            while (i > 0) {
+                try {
+                    Thread.currentThread().sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (cb.asBinder().isBinderAlive()) {
+                    try {
+                        cb.callback(i, i == 1);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                i--;
+            }
+        }).start();
+        return new Bundle();
+    }
+
+    @Override
+    public Application c() {
+        return DemoApplication.application;
     }
 }

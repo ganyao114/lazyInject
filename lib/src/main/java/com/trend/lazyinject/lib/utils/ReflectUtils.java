@@ -1,7 +1,5 @@
 package com.trend.lazyinject.lib.utils;
 
-import org.aspectj.lang.JoinPoint;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -128,26 +126,6 @@ public class ReflectUtils {
             throw new NullPointerException(message);
         }
         return object;
-    }
-
-    public final static Field getField(JoinPoint joinPoint, Class<? extends Annotation> annoType) {
-        Object instance = joinPoint.getTarget();
-        Class clazz = joinPoint.getSourceLocation().getWithinType();
-        String name = joinPoint.getSignature().getName();
-        Field field = null;
-        if (clazz != null && clazz != ClassNotFoundException.class) {
-            try {
-                field = clazz.getDeclaredField(name);
-            } catch (NoSuchFieldException e) {
-            }
-            if (field == null || !field.isAnnotationPresent(annoType)) {
-                field = getField(clazz, name, annoType);
-            }
-        }
-        if (field == null && instance != null) {
-            field = getField(instance.getClass(), name, annoType);
-        }
-        return field;
     }
 
     public final static Field getField(Class outter, String name, Class<? extends Annotation> annoType) {

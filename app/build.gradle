@@ -1,7 +1,10 @@
 apply plugin: 'com.android.application'
-apply plugin: 'android-aspectjx'
+//apply plugin: 'android-aspectjx'
+apply plugin: 'lazyinject'
+
 android {
     compileSdkVersion 26
+    buildToolsVersion "26.0.2"
     defaultConfig {
         applicationId "com.trend.lazyinject.demo"
         minSdkVersion 15
@@ -23,8 +26,13 @@ android {
     }
 }
 
-aspectjx {
-    include 'trend'
+//aspectjx {
+//    optimize true
+//}
+
+lazyinject {
+    enable true
+    optimize true
 }
 
 dependencies {
@@ -38,4 +46,5 @@ dependencies {
 //    annotationProcessor 'com.trend.lazyinject:compiler:0.0.3-beta'
     compile project(path: ':lib')
     annotationProcessor project(path: ':compiler')
+    compile 'com.wei.android.lib:fingerprintidentify:1.2.1'
 }

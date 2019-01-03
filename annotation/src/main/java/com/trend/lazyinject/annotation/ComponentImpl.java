@@ -11,4 +11,5 @@ public @interface ComponentImpl {
     String component() default "";
     String name() default "default";
     boolean cache() default true;
+    String process() default "";
 }

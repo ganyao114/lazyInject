@@ -4,19 +4,23 @@ import com.trend.lazyinject.annotation.DebugLog;
 import com.trend.lazyinject.lib.provider.IProvider;
 import com.trend.lazyinject.lib.utils.ReflectUtils;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by ganyao on 2017/12/4.
  */
 
-public class ComponentContainer {
+public class ComponentContainer implements Serializable {
 
     private Class componentType;
-    private Map<Type,IProvider> providers = new HashMap<>();
+    private Map<Type,IProvider> providers = new ConcurrentHashMap<>();
+    private Map<String,IProvider> providersWithKey = new HashMap<>();
+    private Map<String,Method> methods = new HashMap<>();
 
 
     public Class getComponentType() {
@@ -29,6 +33,15 @@ public class ComponentContainer {
 
     public void addProvider(Type type, IProvider provider) {
         providers.put(type, provider);
+        providersWithKey.put(provider.key(), provider);
+    }
+
+    public void addMethod(Method method) {
+        methods.put(method.toGenericString(), method);
+    }
+
+    public Method getMethod(String key) {
+        return methods.get(key);
     }
 
     @DebugLog
@@ -43,6 +56,16 @@ public class ComponentContainer {
             }
         }
         return provider;
+    }
+
+    public IProvider getProvider(String key) {
+        return providersWithKey.get(key);
+    }
+
+    public synchronized void setNeedIPC(boolean ipc) {
+        for (IProvider provider:providers.values()) {
+            provider.setIPC(ipc);
+        }
     }
 
 }

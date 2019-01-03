@@ -1,6 +1,6 @@
 package com.trend.lazyinject.lib.proxy;
 
-import java.lang.reflect.Method;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.util.Map;
@@ -15,6 +15,10 @@ public class InterfaceProxy {
     static Map<Class,Object> proxies = new ConcurrentHashMap<>();
 
     public static <T> T make(Class<T> inter) {
+        return make(inter, new EmptyHandler());
+    }
+
+    public static <T> T make(Class<T> inter, InvocationHandler handler) {
         if (inter == null)
             return null;
         T proxy = (T) proxies.get(inter);
@@ -24,7 +28,7 @@ public class InterfaceProxy {
             try {
                 proxy = (T) Proxy.newProxyInstance(inter.getClassLoader(),
                         new Class[]{inter},
-                        new DynamicHandler());
+                        handler);
             } catch (Exception e) {
             }
         }

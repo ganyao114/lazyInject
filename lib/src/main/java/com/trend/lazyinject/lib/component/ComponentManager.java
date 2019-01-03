@@ -3,19 +3,9 @@ package com.trend.lazyinject.lib.component;
 import android.text.TextUtils;
 
 import com.trend.lazyinject.annotation.DebugLog;
-import com.trend.lazyinject.annotation.Inject;
 import com.trend.lazyinject.annotation.Name;
-import com.trend.lazyinject.annotation.InjectComponent;
-import com.trend.lazyinject.lib.cache.ProviderCache;
-import com.trend.lazyinject.lib.di.ComponentContainer;
-import com.trend.lazyinject.lib.di.DIImpl;
-import com.trend.lazyinject.lib.log.LOG;
-import com.trend.lazyinject.lib.proxy.InterfaceProxy;
 import com.trend.lazyinject.lib.utils.ValidateUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,7 +39,7 @@ public class ComponentManager {
         }
         components.put(type, instance);
         if (cacheProvider) {
-            singletonsMap.put(instance, new Singletons());
+            singletonsMap.put(type, new Singletons());
             ComponentBuilder.registerProviderAsync(type);
         }
     }
@@ -97,7 +87,7 @@ public class ComponentManager {
         synchronized (type) {
             Object o = components.remove(type);
             if (o != null) {
-                singletonsMap.remove(o);
+                singletonsMap.remove(type);
                 if (o instanceof IComponentDestroy) {
                     Destroyed destroyed = ((IComponentDestroy) o).onComponentDestroyed();
                     destroyed.isDestroyed = true;
