@@ -4,10 +4,10 @@ import com.android.SdkConstants
 import com.android.annotations.NonNull
 import com.android.build.api.transform.*
 import com.android.utils.FileUtils
+import com.google.common.io.ByteStreams
 import com.google.common.io.Files
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
-import org.stringtemplate.v4.ST
 
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ForkJoinPool
@@ -33,7 +33,7 @@ abstract class IncrementalTransform extends Transform {
 
     Set<String> dirtyClassName = new HashSet<>()
 
-    void addDirtyClass(String filePath, String jarEntryName, byte[] classBytes) {
+    public void addDirtyClassBytes(String filePath, String jarEntryName, byte[] classBytes) {
         FileNeedInject fileNeedInject = dirtyFile.get(filePath)
         if (fileNeedInject == null) {
             synchronized (filePath.intern()) {

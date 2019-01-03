@@ -54,14 +54,12 @@ public abstract class JavassistTransform extends IncrementalTransform implements
                         } catch (Exception e) {
                             return false
                         }
-                    }.forEach(new Consumer<Map.Entry<String,CtClass>>() {
-                        @Override
-                        void accept(Map.Entry<String,CtClass> entry) {
-                            String jarEntryName = entry.key
-                            CtClass ctClass = entry.value
-                            addDirtyClass(filePath, jarEntryName, ctClass.toBytecode())
-                        }
-                    })
+                    }.forEach {
+                        String jarEntryName = it.key
+                        CtClass ctClass = it.value
+                        byte[] classBytes = ctClass.toBytecode()
+                        addDirtyClassBytes(filePath, jarEntryName, classBytes)
+                    }
                 }.get()
             } else if (javassistFile.ctClass != null) {
                 //.class
@@ -74,7 +72,7 @@ public abstract class JavassistTransform extends IncrementalTransform implements
                     return
                 }
                 if (isClassDirty(javassistFile.ctClass.name)) {
-                    addDirtyClass(filePath, null, javassistFile.ctClass.toBytecode())
+                    addDirtyClassBytes(filePath, null, javassistFile.ctClass.toBytecode())
                 }
             }
         }
