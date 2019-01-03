@@ -445,10 +445,10 @@ public class TestComponentImpl implements TestComponent {
 
 # 使用中
 
-![dr_safety.png](/doc/dr_safety.png)
+<img src="https://github.com/ganyao114/lazyInject/raw/master/doc/dr_safety.png" width="120" hegiht="120" align=left />
 [Dr.Safety](https://play.google.com/store/apps/details?id=com.trendmicro.freetmms.gmobi)
 
-![dr_safety_main.png](/doc/dr_safety_main.png)
+<img src="https://github.com/ganyao114/lazyInject/raw/master/doc/dr_safety_main.png" width="400" hegiht="700" align=center />
 
 # Email
 939543405@qq.com  
