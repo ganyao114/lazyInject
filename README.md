@@ -443,5 +443,12 @@ public class TestComponentImpl implements TestComponent {
 # 实现原理  
 [Design Document](https://github.com/ganyao114/lazyInject/blob/master/doc/di_design.md)
 
+# 使用中
+
+![dr_safety.png](/doc/dr_safety.png)
+[Dr.Safety](https://play.google.com/store/apps/details?id=com.trendmicro.freetmms.gmobi)
+
+![dr_safety_main.png](/doc/dr_safety_main.png)
+
 # Email
 939543405@qq.com  
