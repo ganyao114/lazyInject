@@ -28,7 +28,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(path: ':annotation')
+    implementation "org.aspectj:aspectjrt:1.8.+"
+    provided project(path: ':annotation')
+    provided project(path: ':lib')
 }
 
 
@@ -37,7 +39,7 @@ apply plugin: 'com.novoda.bintray-release'
 publish {
     userOrg = rootProject.userOrg
     groupId = rootProject.groupId
-    artifactId = 'lib'
+    artifactId = 'aspectjsupport'
     publishVersion = rootProject.publishVersion
     desc = rootProject.desc
     website = rootProject.website

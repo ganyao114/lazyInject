@@ -1,4 +1,4 @@
-package com.trend.lazyinject.lib.di;
+package com.trend.lazyinject.aspectjsupport;
 
 import android.text.TextUtils;
 
@@ -6,7 +6,6 @@ import com.trend.lazyinject.annotation.InjectComponent;
 import com.trend.lazyinject.lib.component.ComponentManager;
 import com.trend.lazyinject.lib.log.LOG;
 import com.trend.lazyinject.lib.proxy.InterfaceProxy;
-import com.trend.lazyinject.lib.utils.ReflectUtils;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -18,7 +17,7 @@ import java.lang.reflect.Field;
 /**
  * Created by ganyao on 2017/12/5.
  */
-//@Aspect
+@Aspect
 public class InjectComponentAspect {
 
     @Pointcut("get(* *) && @annotation(injectComponent)")
@@ -29,7 +28,7 @@ public class InjectComponentAspect {
     @Around("pointcutInjectComponent(injectComponent)")
     public Object aroundFieldGet(ProceedingJoinPoint joinPoint, InjectComponent injectComponent) throws Throwable {
         Object targetObj = joinPoint.getTarget();
-        Field field = ReflectUtils.getField(joinPoint, InjectComponent.class);
+        Field field = ReflectionUtils.getField(joinPoint, InjectComponent.class);
         if (field == null)
             return joinPoint.proceed();
         if (!field.isAccessible()) {

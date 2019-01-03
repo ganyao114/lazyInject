@@ -1,6 +1,7 @@
-package com.trend.lazyinject.lib.di;
+package com.trend.lazyinject.aspectjsupport;
 
 import com.trend.lazyinject.annotation.Inject;
+import com.trend.lazyinject.lib.di.DIImpl;
 import com.trend.lazyinject.lib.proxy.InterfaceProxy;
 import com.trend.lazyinject.lib.utils.ReflectUtils;
 import com.trend.lazyinject.lib.utils.ValidateUtil;
@@ -16,7 +17,7 @@ import java.lang.reflect.Field;
 /**
  * Created by swift_gan on 2017/12/7.
  */
-//@Aspect
+@Aspect
 public class InjectAspect {
 
 
@@ -29,7 +30,7 @@ public class InjectAspect {
     @Around("pointcutInject(inject)")
     public Object aroundFieldGet(ProceedingJoinPoint joinPoint, Inject inject) throws Throwable {
         Object targetObj = joinPoint.getTarget();
-        Field field = ReflectUtils.getField(joinPoint, Inject.class);
+        Field field = ReflectionUtils.getField(joinPoint, Inject.class);
         if (field == null)
             return joinPoint.proceed();
         if (!field.isAccessible()) {

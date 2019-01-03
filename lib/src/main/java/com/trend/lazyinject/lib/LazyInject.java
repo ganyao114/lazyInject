@@ -11,7 +11,6 @@ import com.trend.lazyinject.lib.di.DIImpl;
 import com.trend.lazyinject.lib.di.InjectComponentWeave;
 import com.trend.lazyinject.lib.di.InjectWeave;
 import com.trend.lazyinject.lib.log.LOG;
-import com.trend.lazyinject.lib.log.MethodMonitor;
 
 import java.lang.reflect.Field;
 
@@ -89,7 +88,6 @@ public class LazyInject {
 
     public static void setDebug(boolean debug) {
         LOG.DEBUGGING_ENABLED = debug;
-        MethodMonitor.DEBUG = debug;
     }
 
 }
