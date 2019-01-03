@@ -1,6 +1,37 @@
 # 1.lazyInject
 被动依赖注入框架 for Android
 
+## 特点
+
+- 被动注入，通过编译期间 hook field access 实现，无需手动调用 inject
+- 懒加载 or 实时更新，由于 hook 了每一个 GETFIELD/GETSTATIC 指令，使懒加载或者实时更新成为可能
+- 完整的范型匹配
+- 较少的反射，大多数情况下可以在编译期间直接匹配到 provider 方法
+- 支持静态变量注入
+- 跨进程注入
+- 支持增量编译/Instant Run
+- 支持 Proguard
+
+## 项目结构
+
+- app：example
+- annotation：注入使用的注解
+- aopweave：gradle plugin，编译期间 hook FiledAccess 并注入代码的织入器
+- compiler：注解处理器，用于组装注入容器 Component 和其实现
+- lib：运行时库
+- aspectjsupport：如果不使用内置的 aopweave hook FiledAccess，可以依赖此使用 aspectj hook
+- kotlinsupport：使用 kotlin 原生特性代理实现注入
+
+## 编译调试项目
+
+- 打包 annotation 到本地 maven repo
+./gradlew :annotation:uploadArchives
+- 打包 aopweave 到本地 maven repo
+./gradleW :aopweave:uploadArchives
+- 开始调试 gradle plugin
+./gradlew assembleDebug -Dorg.gradle.daemon=false -Dorg.gradle.debug=true --stacktrace  
+
+
  [ ![Download](https://api.bintray.com/packages/ganyao114/maven/lib/images/download.svg) ](https://bintray.com/ganyao114/maven/lib/_latestVersion)
 # 2.配置
 ## Gradle  
@@ -9,11 +40,18 @@
 buildscript {
     
     ...
+
+    repositories {
+        ...
+        maven {
+            url "https://dl.bintray.com/ganyao114/maven/"
+        }
+        ...
+    }
     
     dependencies {
         ...
-        //此依赖用于实现 AspectJ,如有其他合适项目可以自行替换，现由 https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx 实现
-        classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.1'
+        classpath 'com.trend.lazyinject:aopweave:3.4.0-beta'
         ...
     }
 }  
@@ -31,21 +69,29 @@ allprojects {
 }
 
 ```
-app 或者 lib/build.gradle
+app/build.gradle
 ```groovy
-//同上：如有其他 AspectJ 实现请自行替换
-apply plugin: 'android-aspectjx'
+apply plugin: 'lazyinject'
+
+lazyinject {
+    //是否开启注入
+    enable true
+    //启用编译期间类型匹配，可以减少运行期间反射，建议开启
+    optimize true
+    //包名数组，过滤需要注入的包，加快编译
+    includes "your pkg scope"
+}
 
 dependencies {
-    compile 'com.trend.lazyinject:lib:1.0.0'
-    annotationProcessor 'com.trend.lazyinject:compiler:1.0.0'
-    //如果使用 kotlin
-    compile 'com.trend.lazyinject:kotlinsupport:1.0.0'
+    ...
+    annotationProcessor 'com.trend.lazyinject:compiler:3.4.0-beta'
+    ...
 }
 
 ```  
 ## 混淆  
 ```proguard
+-ignorewarning
 -keepattributes *Annotation*
 #保留部分泛型信息，必要!
 -keepattributes Signature
@@ -372,16 +418,18 @@ android {
 LazyInject.setDebug(true);
 ```
 
-## 实验性功能
-### 在子进程实现 Component
-依赖 2.0.3-beta 版本可以使用此 Feature
-代码在 multi_process 分支
+## 在子进程实现 Component
+Component 的实现可以在子进程
+
 ```java
 @ComponentImpl(process = "com.trend.lazyinject.demo.p1")
 public class TestComponentImpl implements TestComponent {
     ...
+    Serializable/Parcelable/IBinder remoteProvider(Serializable/Parcelable/IBinder pars){}
+    ...
 }
 ```
+
 需要在 Manifest 中为子进程注册一个 StubProvider, authorities 必须与子进程名相同。注意不要 exported, 否则会有安全风险
 ```xml
 <provider
@@ -389,6 +437,7 @@ public class TestComponentImpl implements TestComponent {
       android:name="com.trend.lazyinject.lib.ipc.InjectIPCProvider"
       android:process="com.trend.lazyinject.demo.p1" />
 ```
+
 因为需要 IPC，所以所有 Provider 方法的参数和返回值必须继承自 Serializable/Parcelable/IBinder
 你也可以直接调用 Component 中的方法，这些都是支持 IPC 的
 # 实现原理  
