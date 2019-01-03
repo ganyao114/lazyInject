@@ -13,7 +13,7 @@ import java.util.jar.JarFile
 
 class JavassistClassGetter {
 
-    static ClassContainer toCtClasses(Collection<TransformInput> inputs, ClassPool classPool, WeaveConfig config) {
+    static JavassistClassContainer toCtClasses(Collection<TransformInput> inputs, ClassPool classPool, WeaveConfig config) {
         HashSet<String> classNames = new HashSet<>()
         def startTime = System.currentTimeMillis()
         inputs.each {
@@ -42,7 +42,7 @@ class JavassistClassGetter {
         }
         def cost = (System.currentTimeMillis() -startTime) / 1000
         println "read all class file cost $cost second"
-        ClassContainer classContainer = new ClassContainer()
+        JavassistClassContainer classContainer = new JavassistClassContainer()
         classNames.each {
             checkCtClass(classPool, classContainer, classPool.get(it), config)
         }
@@ -50,8 +50,55 @@ class JavassistClassGetter {
         return classContainer
     }
 
+    static loadClass(File file, JavassistClassContainer container, LoaderFilter filter) {
+        ClassPool classPool = container.classPool
+        if (file.isDirectory()) {
+            FileUtils.listFiles(file, null, true).each {
+                loadClass(it, classPool, container)
+            }
+        } else if (file.absolutePath.endsWith(SdkConstants.DOT_CLASS)) {
+            if (filter.filter(file.absolutePath)) {
+                CtClass ctClass = getCtClass(classPool, new FileInputStream(file))
+                if (ctClass != null) {
+                    container.addCtClass(file.absolutePath, null, ctClass)
+                }
+            }
+        } else if (file.absolutePath.endsWith(SdkConstants.DOT_JAR)) {
+            def jarFile = new JarFile(file)
+            jarFile.stream().filter {
+                it.name.endsWith(SdkConstants.DOT_CLASS)
+            }.each {
+                def className = it.name.substring(0, it.name.length() - SdkConstants.DOT_CLASS.length()).replaceAll('/', '.')
+                if (filter.filter(className)) {
+                    CtClass ctClass = classPool.get(className)
+                    if (ctClass != null) {
+                        container.addCtClass(file.absolutePath, it.name, ctClass)
+                    }
+                }
+            }
+        }
+    }
 
-    static void checkCtClass(ClassPool classPool, ClassContainer container, CtClass ctClass, WeaveConfig config) {
+    interface LoaderFilter {
+        boolean filter(String classPath)
+    }
+
+    static CtClass getCtClass(ClassPool classPool, InputStream inputStream) {
+        CtClass clazz
+        try {
+            clazz = classPool.makeClass(inputStream)
+            return clazz
+        } catch (RuntimeException e) {
+            e.printStackTrace()
+            //TODO 重复打开已冻结类，说明有重复类，跳过修改
+            return clazz
+        } finally {
+            inputStream.close()
+        }
+    }
+
+
+    static void checkCtClass(ClassPool classPool, JavassistClassContainer container, CtClass ctClass, WeaveConfig config) {
         boolean needAdd = false
         if (config.includes == null || config.includes.length == 0) {
             needAdd = true
@@ -64,6 +111,7 @@ class JavassistClassGetter {
                 }
             }
         }
+        ctClass.isModified()
         if (needAdd) {
             container.classes.add(ctClass)
         } else {

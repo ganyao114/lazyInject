@@ -62,8 +62,12 @@ public class InliningOptimize {
                 return ctMethod
             try {
                 ctMethod = field.declaringClass.getDeclaredMethod(getMethodName(field), null)
+                //remove old method
+                if (ctMethod != null && !ctMethod.declaringClass.isFrozen()) {
+                    field.declaringClass.removeMethod(ctMethod)
+                    ctMethod = null
+                }
             } catch (Exception e) {}
-            //此处最好检查方法注解信息，保证增量更新
             if (ctMethod == null) {
                 ctMethod = callback.makeMethod()
             }

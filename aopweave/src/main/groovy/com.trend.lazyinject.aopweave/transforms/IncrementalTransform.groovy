@@ -5,11 +5,11 @@ import com.android.annotations.NonNull
 import com.android.build.api.transform.*
 import com.android.utils.FileUtils
 import com.google.common.io.Files
-import com.trend.lazyinject.aopweave.classes.JavassistClassGetter
-import javassist.ClassPool
-import javassist.WeaveClassPool
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
 
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ForkJoinPool
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -18,19 +18,44 @@ abstract class IncrementalTransform extends Transform {
 
     Project project
 
+    Logger logger
+
+
     List<File> classPaths = new LinkedList<>()
     List<File> filesNeedInject = new LinkedList<>()
 
-    ClassPool classPool
+    Map<String,FileNeedInject> dirtyFile = new ConcurrentHashMap<>()
+
+    void addDirtyClass(String filePath, String jarEntryName, byte[] classBytes) {
+        FileNeedInject fileNeedInject = dirtyFile.get(filePath)
+        if (fileNeedInject == null) {
+            synchronized (filePath.intern()) {
+                fileNeedInject = dirtyFile.get(filePath)
+                if (fileNeedInject == null) {
+                    fileNeedInject = new FileNeedInject()
+                    if (jarEntryName != null && !jarEntryName.isEmpty()) {
+                        fileNeedInject.isJar = true
+                        fileNeedInject.jarBytes = new ConcurrentHashMap<>()
+                    } else {
+                        fileNeedInject.isJar = false
+                    }
+                    dirtyFile.put(filePath, fileNeedInject)
+                }
+            }
+        }
+        if (fileNeedInject.isJar) {
+            fileNeedInject.jarBytes.put(jarEntryName, classBytes)
+        } else {
+            fileNeedInject.classBytes = classBytes
+        }
+    }
 
     IncrementalTransform(Project project) {
         this.project = project
-        if (useJavassist()) {
-            classPool = new WeaveClassPool(true)
-        }
+        this.logger = project.logger
         //add system boot classpath
         project.android.bootClasspath.each {
-            classPaths.add(it)
+            classPaths << it
         }
     }
 
@@ -81,7 +106,7 @@ abstract class IncrementalTransform extends Transform {
                                 break
                             case Status.REMOVED:
                                 File outFile = toOutputFile(outputDir, dirInput.file, inputFile)
-                                Logger.i("===========class file removed: ${outFile.absolutePath}")
+                                log("=========== class file removed: ${outFile.absolutePath}")
                                 FileUtils.deleteIfExists(outFile)
                                 break
                         }
@@ -99,7 +124,7 @@ abstract class IncrementalTransform extends Transform {
 
             //遍历jar
             input.jarInputs.each { JarInput jarInput ->
-                Logger.d(jarInput.name + " status: " + jarInput.status)
+                log(jarInput.name + " status: " + jarInput.status)
                 final File outJarFile = outputProvider.getContentLocation(
                         jarInput.name,
                         jarInput.contentTypes,
@@ -118,8 +143,8 @@ abstract class IncrementalTransform extends Transform {
                             onRealTransformJar(jarInput, outJarFile)
                             break
                         case Status.REMOVED:
-                            Logger.i("===========jar input: ${jarInput.file.absolutePath}")
-                            Logger.i("===========jar removed: ${outJarFile.absolutePath}")
+                            log("===========jar input: ${jarInput.file.absolutePath}")
+                            log("===========jar removed: ${outJarFile.absolutePath}")
                             FileUtils.deleteIfExists(outJarFile)
                             break
                     }
@@ -160,7 +185,7 @@ abstract class IncrementalTransform extends Transform {
      * @param dirInput
      */
     void onEachDirectory(DirectoryInput dirInput) {
-        classPaths.add(dirInput.file)
+        classPaths << dirInput.file
     }
 
     /**
@@ -173,7 +198,7 @@ abstract class IncrementalTransform extends Transform {
         Files.createParentDirs(outputFile)
         FileUtils.copyFile(inputFile, outputFile)
 
-        injectForFile(outputFile)
+        filesNeedInject << outputFile
     }
 
     void onRealTransformJar(JarInput jarInput, File outJarFile) {
@@ -181,7 +206,7 @@ abstract class IncrementalTransform extends Transform {
         FileUtils.copyFile(jarInput.file, outJarFile)
 
         if (filter(jarInput)) {
-            injectForJar(outJarFile)
+            filesNeedInject << outJarFile
         }
     }
 
@@ -190,7 +215,7 @@ abstract class IncrementalTransform extends Transform {
      * @param jarInput
      */
     void onEachJar(JarInput jarInput) {
-        classPaths.add(jarInput.file)
+        classPaths << jarInput.file
     }
 
     /**
@@ -204,13 +229,53 @@ abstract class IncrementalTransform extends Transform {
      * Transform.transform() 接口结束时回调
      */
     void onTransformEnd(TransformInvocation invocation) {
-        if (useJavassist()) {
-            JavassistClassGetter.addClassPath(classPaths, classPool)
-        }
 
+        if (enable()) {
+
+            long start = System.currentTimeMillis()
+
+            log("start weave")
+
+            loadClass(invocation)
+            doInject(invocation)
+            diffClass(invocation)
+            flushClass(invocation)
+
+            log("end weave - cost: " + (System.currentTimeMillis() - start) + " ms")
+        } else {
+            log("disabled, so only copy file")
+        }
     }
 
-    abstract boolean useJavassist()
+    abstract void loadClass(TransformInvocation invocation)
+
+    abstract void doInject(TransformInvocation invocation)
+
+    abstract void diffClass(TransformInvocation invocation)
+
+    void flushClass(TransformInvocation invocation) {
+        if (!dirtyFile.isEmpty()) {
+            new ForkJoinPool().submit {
+                dirtyFile.entrySet().parallelStream().forEach {
+                    File file = new File(it.key)
+                    FileNeedInject fileNeedInject = it.value
+                    if (fileNeedInject.isJar) {
+                        if (fileNeedInject.jarBytes != null && !fileNeedInject.jarBytes.isEmpty()) {
+                            flushForJar(file, fileNeedInject)
+                        }
+                    } else {
+                        if (fileNeedInject.classBytes != null) {
+                            flushForFile(file, fileNeedInject)
+                        }
+                    }
+                }
+            }.get()
+        }
+    }
+
+    boolean enable() {
+        return true
+    }
 
     boolean filter(String classPath) {
         return true
@@ -220,26 +285,22 @@ abstract class IncrementalTransform extends Transform {
         return true
     }
 
-    abstract byte[] doInject(String className, InputStream inputStream)
 
-
-    private static void injectForFile(File file) {
+    private void flushForFile(File file, FileNeedInject fileNeedInject) {
         final int index = file.absolutePath.indexOf(getName()) + getName()
         Closure handleFileClosure = { File innerFile ->
             String filePath = innerFile.absolutePath
-            if (filter(filePath)) {
+            if (fileNeedInject.jarBytes != null) {
                 def outputFile = new File(buildDir, TMP_DIR + innerFile.absolutePath.substring(index))
                 Files.createParentDirs(outputFile)
                 FileInputStream inputStream = new FileInputStream(innerFile)
                 FileOutputStream outputStream = new FileOutputStream(outputFile)
-                byte[] modified = injectForInputStream(innerFile.name, inputStream)
+                byte[] modified = fileNeedInject.classBytes
                 outputStream.write(modified)
                 inputStream.close()
                 outputStream.close()
 
                 Files.copy(outputFile, innerFile)
-            } else {
-//                Logger.i("skip class file:>> " + filePath)
             }
         }
 
@@ -253,7 +314,7 @@ abstract class IncrementalTransform extends Transform {
         }
     }
 
-    private void injectForJar(File outJarFile) {
+    private void flushForJar(File outJarFile, FileNeedInject fileNeedInject) {
         final int index = outJarFile.absolutePath.indexOf(getName()) + getName().length()
         final def tmpFile = new File(buildDir, TMP_DIR + outJarFile.absolutePath.substring(index))
         Files.createParentDirs(tmpFile)
@@ -263,8 +324,8 @@ abstract class IncrementalTransform extends Transform {
 
                 ZipEntry entry
                 while ((entry = zis.getNextEntry()) != null) {
-                    if (filter(entry.name)) {
-                        byte[] modified = injectForInputStream(entry.name, zis)
+                    byte[] modified = fileNeedInject.jarBytes.get(entry.name)
+                    if (modified != null) {
                         zos.putNextEntry(new ZipEntry(entry.name))
                         zos.write(modified)
                     } else {
@@ -278,6 +339,10 @@ abstract class IncrementalTransform extends Transform {
         }
 
         Files.copy(tmpFile, outJarFile)
+    }
+
+    void log(String msg) {
+        logger.info("LazyInject<" + getName() + "> - " + msg)
     }
 
 }

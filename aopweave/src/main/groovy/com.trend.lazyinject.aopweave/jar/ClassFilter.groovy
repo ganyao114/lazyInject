@@ -7,7 +7,7 @@ import java.util.jar.JarFile;
 
 public class ClassFilter {
 
-    static boolean  isIncludeFilterMatched(String str, List<String> filters) {
+    static boolean isIncludeFilterMatched(String str, List<String> filters) {
         return isFilterMatched(str, filters)
     }
 
@@ -60,6 +60,10 @@ public class ClassFilter {
 
             return total
         }
+    }
+
+    public static boolean filterClass(String classPath, List<String> includes) {
+        return isIncludeFilterMatched(classPath, includes)
     }
 
     public static boolean filterJar(JarInput jarInput, List<String> includes) {
