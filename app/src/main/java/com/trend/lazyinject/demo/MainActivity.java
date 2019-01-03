@@ -106,6 +106,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (inner != null) {
             Log.d("test", "Inner inject success = " + inner.toString());
         }
+
+        if (inner != null) {
+            Log.d("test", "Inner inject success = " + inner.toString());
+        }
         if (nullProtectTestA != null) {
             nullProtectTestA.test1();
             nullProtectTestA.test2("....");

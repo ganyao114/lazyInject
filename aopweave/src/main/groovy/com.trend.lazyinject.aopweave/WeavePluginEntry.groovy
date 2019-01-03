@@ -33,11 +33,11 @@ public class WeavePluginEntry extends Transform implements Plugin<Project> {
     void apply(Project project) {
         this.project = project
 
-        project.android.registerTransform(new LazyInjectTransform(project))
+        project.android.registerTransform(this)
 
-//        project.extensions.create("lazyinject",WeaveConfig)
-//        logger = project.logger
-//        config = project.lazyinject
+        project.extensions.create("lazyinject",WeaveConfig)
+        logger = project.logger
+        config = project.lazyinject
     }
 
 

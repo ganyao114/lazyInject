@@ -9,7 +9,6 @@ import javassist.WeaveClassPool
 import org.gradle.api.Project
 
 import java.util.concurrent.ForkJoinPool
-import java.util.function.Consumer
 
 public abstract class JavassistTransform extends IncrementalTransform implements JavassistClassGetter.LoaderFilter {
 

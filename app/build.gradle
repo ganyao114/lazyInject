@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 //apply plugin: 'android-aspectjx'
-apply plugin: 'lazyInject'
+apply plugin: 'lazyinject'
 
 android {
     compileSdkVersion 26
@@ -16,7 +16,7 @@ android {
     buildTypes {
         debug {
             debuggable true
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), '../proguard-rules.pro'
         }
     }

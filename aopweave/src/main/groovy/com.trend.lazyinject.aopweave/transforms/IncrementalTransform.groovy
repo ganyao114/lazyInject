@@ -192,25 +192,12 @@ abstract class IncrementalTransform extends Transform {
         return new File(outputDir, FileUtils.relativePossiblyNonExistingPath(inputFile, inputDir))
     }
 
-    /**
-     * Transform.transform() 接口开始时回调
-     */
     void onTransformStart(TransformInvocation invocation) {}
 
-    /**
-     * 遍历 DirectoryInput 时回调
-     * @param dirInput
-     */
     void onEachDirectory(DirectoryInput dirInput) {
         classPaths << dirInput.file
     }
 
-    /**
-     * 在非增量模式下：对所有输入文件回调；增量模式下：只对有变化的输入文件回调
-     * @param dirInput 遍历目录时的 DirectoryInput
-     * @param inputFile 遍历 DirectoryInput 时的 File
-     * @param outputFile 根据 inputFile 创建的 File
-     */
     void onRealTransformFile(DirectoryInput dirInput, File inputFile, File outputFile) {
         Files.createParentDirs(outputFile)
         FileUtils.copyFile(inputFile, outputFile)
@@ -227,39 +214,33 @@ abstract class IncrementalTransform extends Transform {
         }
     }
 
-    /**
-     * 遍历 JarInput 时回调
-     * @param jarInput
-     */
     void onEachJar(JarInput jarInput) {
         classPaths << jarInput.file
     }
 
-    /**
-     * 在非增量模式下：对所有输入 Jar 回调；增量模式下：只对有变化的输入 Jar 文件回调
-     * @param jarInput 遍历目录时的 JarInput
-     * @param outJarFile 根据 JarInput 生成的 File
-     */
-
-    /**
-     * Transform.transform() 接口结束时回调
-     */
     void onTransformEnd(TransformInvocation invocation) {
 
         if (enable()) {
 
             long start = System.currentTimeMillis()
 
-            log("start weave")
+            warn("start weave")
 
             loadClass(invocation)
             doInject(invocation)
             diffClass(invocation)
             flushClass(invocation)
 
-            log("end weave - cost: " + (System.currentTimeMillis() - start) + " ms")
+            warn("end weave - cost: " + (System.currentTimeMillis() - start) + " ms")
+            warn("deal " + dirtyClassName.size() + " classes")
+
+            if (invocation.isIncremental() && dirtyClassName.size() > 0) {
+                warn("======================== classes deal ============================")
+                printDealClasses()
+                warn("======================== classes deal ============================")
+            }
         } else {
-            log("disabled, so only copy file")
+            warn("disabled, so only copy file")
         }
     }
 
@@ -358,6 +339,16 @@ abstract class IncrementalTransform extends Transform {
 
     void log(String msg) {
         logger.info("LazyInject<" + getName() + "> - " + msg)
+    }
+
+    void warn(String msg) {
+        logger.warn("LazyInject<" + getName() + "> - " + msg)
+    }
+
+    void printDealClasses() {
+        dirtyClassName.each {
+            warn("class: " + it)
+        }
     }
 
     String getTmpDir() {
