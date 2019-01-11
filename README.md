@@ -38,36 +38,12 @@
 根目录/build.gradle  
 ```groovy
 buildscript {
-    
-    ...
-
-    repositories {
-        ...
-        maven {
-            url "https://dl.bintray.com/ganyao114/maven/"
-        }
-        ...
-    }
-    
     dependencies {
         ...
         classpath 'com.trend.lazyinject:aopweave:3.4.0-beta'
         ...
     }
-}  
-  
-...  
-  
-allprojects {
-    repositories {
-        ...
-        maven {
-            url "https://dl.bintray.com/ganyao114/maven/"
-        }
-        ...
-    }
 }
-
 ```
 app/build.gradle
 ```groovy
