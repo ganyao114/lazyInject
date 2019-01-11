@@ -1,5 +1,8 @@
 # 1.lazyInject
-被动依赖注入框架 for Android
+
+被动依赖注入框架 for Android. 
+
+ [ ![Download](https://api.bintray.com/packages/ganyao114/maven/lib/images/download.svg) ](https://bintray.com/ganyao114/maven/lib/_latestVersion)
 
 ## 特点
 
@@ -32,7 +35,6 @@
 ./gradlew assembleDebug -Dorg.gradle.daemon=false -Dorg.gradle.debug=true --stacktrace  
 
 
- [ ![Download](https://api.bintray.com/packages/ganyao114/maven/lib/images/download.svg) ](https://bintray.com/ganyao114/maven/lib/_latestVersion)
 # 2.配置
 ## Gradle  
 根目录/build.gradle  
