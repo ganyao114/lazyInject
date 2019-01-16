@@ -195,6 +195,7 @@ public class DemoApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        LazyInject.init(this);
         LazyInject.addBuildMap(Auto_ComponentBuildMap.class);
     }
 }
